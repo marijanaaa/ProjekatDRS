@@ -1,0 +1,7 @@
+version : "3.10.2"
+services:
+  backend:
+    build: 
+      context: ./Engine
+    ports:
+      - 5000:5000
