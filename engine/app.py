@@ -2,6 +2,7 @@
 from flask import Flask, jsonify
 import pymongo
 from pymongo import MongoClient
+from CriptoCurrency import getAssetsCoinCapAPI
 
 app = Flask(__name__)
 
