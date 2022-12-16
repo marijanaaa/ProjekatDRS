@@ -1,20 +1,50 @@
-db = db.getSiblingDB("animal_db");
-db.animal_tb.drop();
+db = db.getSiblingDB("cryptocurrency_db");
+db.cryptocurrency_db.drop();
+userCollection = db["users"]
+//transakcije se samo inicijalizuju kao kolekcija, nema inicijalnih podataka
+transactionCollection = db["transactions"]
 
-db.animal_tb.insertMany([
+userCollection.insertMany([
     {
-        "id": 1,
-        "name": "Lion",
-        "type": "wild"
+        "_id": 1,
+        "name": "Marijana",
+        "lastname": "Stojanovic",
+        "address" : "Danila Kisa 26",
+        "town": "Novi Sad",
+        "state": "Republika Srbija",
+        "number": "0649163524",
+        "email": "marijanaaastojanovic@gmail.com",
+        "password": 1234,
+        "isVerified": true,
+        "cryptocurrencies":{
+            "BTC":0,
+            "ETH":0,
+            "USDT":0,
+            "BUSD":0,
+            "DOGE":0
+        },
+        "balanceInDollars":0
     },
     {
-        "id": 2,
-        "name": "Cow",
-        "type": "domestic"
-    },
-    {
-        "id": 3,
-        "name": "Tiger",
-        "type": "wild"
+        "_id": 2,
+        "name": "Katarina",
+        "lastname": "Prodanovic",
+        "address" : "Danila Kisa 26",
+        "town": "Novi Sad",
+        "state": "Republika Srbija",
+        "number": "0649163524",
+        "email": "katarina@gmail.com",
+        "password": 1234,
+        "isVerified": true,
+        "cryptocurrencies":{
+            "BTC":0,
+            "ETH":0,
+            "USDT":0,
+            "BUSD":0,
+            "DOGE":0
+        },
+        "balanceInDollars":0
     },
 ]);
+
+

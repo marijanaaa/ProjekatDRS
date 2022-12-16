@@ -19,7 +19,7 @@ services:
     container_name: mongodb
     hostname: test_mongodb
     environment:
-      - MONGO_INITDB_DATABASE=animal_db
+      - MONGO_INITDB_DATABASE=cryptocurrency_db
       - MONGO_INITDB_ROOT_USERNAME=root
       - MONGO_INITDB_ROOT_PASSWORD=pass
     volumes:
@@ -46,6 +46,7 @@ services:
       - mongo
     depends_on:
       - db
+  
 networks:
   mongo:
     driver: bridge
