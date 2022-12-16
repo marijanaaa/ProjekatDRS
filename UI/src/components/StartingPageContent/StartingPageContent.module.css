@@ -1,0 +1,24 @@
+.starting {
+    margin: 3rem auto;
+    text-align: center;
+   
+
+  }
+  
+  .starting h1 {
+    font-size: 5rem;
+  }
+  .starting-image {
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    overflow: hidden;
+  }
+  
+  .starting-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+   
+  }
+  
