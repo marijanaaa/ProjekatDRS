@@ -13,9 +13,9 @@ function useHttp() {
     });
 
 
-    console.log(requestConfig.body);
+    
     let data = await response.json();
-  
+    
     if (!response.ok) {
       
       data = {

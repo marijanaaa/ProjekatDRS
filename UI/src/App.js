@@ -28,6 +28,7 @@ function App() {
           {ctx.isLoggedIn && <Redirect to="/" />}
         </Route>
        
+       
       </Switch>
     </React.Fragment>
   );

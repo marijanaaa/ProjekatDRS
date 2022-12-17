@@ -1,19 +1,20 @@
 import React, {
     useState,
     useReducer,
-    useContext,
     useRef,
     useEffect,
   } from 'react';
   import { useHistory } from 'react-router-dom';
   import Card from '../card/Card';
   import Button from '../button/Button';
-  import AuthContext from '../../../store/auth-context';
+  //import AuthContext from '../../../store/auth-context';
   import Input from '../input/Input';
   import classes from './RegistrationForm.module.css';
   import useHttp from "../../../hook/useHttp";
   
+  
   import Modal from "../modals/Modal";
+  import InfModal from "../modals/InfModal";
 
 
   const nameReducer = (state, action) => {
@@ -109,7 +110,7 @@ import React, {
   function RegistrationForm() {
     const history = useHistory();
     const { isLoading, sendRequest } = useHttp(); //koristimo hook koji je odvojen
-    const ctx = useContext(AuthContext);
+   // const ctx = useContext(AuthContext);
     const [infoData, setInfoData] = useState(null);//da ispise sta se desilo
     
 
@@ -354,11 +355,14 @@ import React, {
         
       };
       const data = await sendRequest(requestConfig);
+      //ono sto vrati server kao odg
      
       setInfoData({
         title: data.hasError ? "Error" : "Success",
         message: data.hasError ? data.message : "User successfully added",
       });
+     
+      
     }
     else if (!nameIsValid) {
       nameRef.current.focus();
@@ -389,10 +393,17 @@ import React, {
   
     return (
       <React.Fragment>
-       
+       {isLoading && <Modal/>}
+       {infoData && (
+        <InfModal
+          title={infoData.title}
+          message={infoData.message}
+          onConfirm={infoData.title === "Error" ?  hideErrorModalHandler : hideSuccessModalHandler}
+        />
+      )}
         <Card className={classes.register}>
           <section className={classes.title}>
-            <h1>Add New User</h1>
+            <h1>REGISTRATION</h1>
           </section>
           <form onSubmit={submitHandler}>
             
@@ -400,7 +411,7 @@ import React, {
               ref={nameRef}
               type="text"
               id="name"
-              label="name:"
+              label="Name:"
               isValid={nameIsValid}
               value={nameState.value}
               onChange={nameChangeHandler}
