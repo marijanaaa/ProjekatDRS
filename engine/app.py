@@ -33,15 +33,14 @@ def get_stored_users():
 #bez validacija
 @app.route('/registration', methods=['POST'])
 def user_registration():
-    name = request.form.get('name')
-    lastname = request.form.get('lastname')
-    address = request.form.get('address')
-    city = request.form.get('city')
-    country= request.form.get('country')
-    number = request.form.get('number')
-    email = request.form.get('email')
-    password = request.form.get('password')
-    print(password)
+    name = request.get_json(force=True).get('name')
+    lastname = request.get_json(force=True).get('lastname')
+    address = request.get_json(force=True).get('address')
+    city = request.get_json(force=True).get('city')
+    country= request.get_json(force=True).get('country')
+    number = request.get_json(force=True).get('number')
+    email = request.get_json(force=True).get('email')
+    password = request.get_json(force=True).get('password')
     userCollection.insert_one({'name':name,'lastname':lastname,'address':address,'city':city,'country':country,
                               'number':number,'email':email,'password':password,'isVerified':False})
     
