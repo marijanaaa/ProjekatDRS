@@ -8,6 +8,7 @@ function LoginPage() {
                 
              </div>
               <LoginForm />
+              
         </div>
         
       );

@@ -5,12 +5,17 @@ from card import verification
 from datetime import datetime #za sortiranje transakcija
 from hash import create_hash
 from enums import transaction_state
+from flask_cors import CORS
+
+
+
 
 #collections
 userCollection = db["users"]
 transactionCollection = db["transactions"]
 
 app = Flask(__name__)
+CORS(app)
 
 @app.route('/')
 def ping_server():
@@ -31,15 +36,17 @@ def user_registration():
     name = request.form.get('name')
     lastname = request.form.get('lastname')
     address = request.form.get('address')
-    town = request.form.get('town')
-    state = request.form.get('state')
+    city = request.form.get('city')
+    country= request.form.get('country')
     number = request.form.get('number')
     email = request.form.get('email')
     password = request.form.get('password')
     print(password)
-    userCollection.insert_one({'name':name,'lastname':lastname,'address':address,'town':town,'state':state,
+    userCollection.insert_one({'name':name,'lastname':lastname,'address':address,'city':city,'country':country,
                               'number':number,'email':email,'password':password,'isVerified':False})
-    return "maja"
+    
+    status = "Successfully registered!"
+    return jsonify({'result': status}) 
     #sta funkcija vraca
 
 #provere fale

@@ -291,9 +291,7 @@ import React, {
     const emailChangeHandler = (event) => {
       dispatchEmail({ type: 'USER_INPUT', val: event.target.value });
   
-      // setFormIsValid(
-      //   event.target.value.includes('@') && passwordState.isValid
-      // );
+    
     };
   
 
@@ -304,9 +302,7 @@ import React, {
     const passwordChangeHandler = (event) => {
       dispatchPassword({ type: 'USER_INPUT', val: event.target.value });
   
-      // setFormIsValid(
-      //   event.target.value.includes('@') && passwordState.isValid
-      // );
+     
     };
   
 
@@ -330,7 +326,7 @@ import React, {
      if(formIsValid){
      
       const requestConfig = {
-        url: 'https://react-app-4391d-default-rtdb.firebaseio.com/usersss.json',
+        url: 'http://localhost:5000/registration',
         method: "POST",
         body: JSON.stringify({
           name:nameState.value ,
@@ -357,6 +353,7 @@ import React, {
       const data = await sendRequest(requestConfig);
       //ono sto vrati server kao odg
      
+      console.log(data);
       setInfoData({
         title: data.hasError ? "Error" : "Success",
         message: data.hasError ? data.message : "User successfully added",

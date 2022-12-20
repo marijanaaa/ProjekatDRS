@@ -68,6 +68,7 @@ import InfModal from '../modals/InfModal';
   
     const authCtx = useContext(AuthContext);
     const history = useHistory();
+
     const emailInputRef = useRef();
     const passwordInputRef = useRef();
   
@@ -95,7 +96,7 @@ import InfModal from '../modals/InfModal';
     }, [emailIsValid, passwordIsValid]);
   
     const emailChangeHandler = (event) => {
-      //console.log(event.target.val);
+     // console.log(event.target.value);
       dispatchEmail({ type: 'USER_INPUT', val: event.target.value });
   
       // setFormIsValid(
@@ -136,14 +137,14 @@ import InfModal from '../modals/InfModal';
      if(formIsValid){
      
       const requestConfig = {
-        url: 'https://react-app-4391d-default-rtdb.firebaseio.com/userss.json',
+        url: 'localhost:5000',
         method: "POST",
         body: JSON.stringify({
           email:emailState.value,
           password: passwordState.value,
          
           token: true,
-         
+
         }
         ),
         headers: {
