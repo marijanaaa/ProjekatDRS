@@ -1,6 +1,6 @@
 from flask import Flask, jsonify, request
 from database import db
-from cryptocurrency import getAssetsCoinCapAPI
+from cryptocurrency import get_assets_coin_cap_API,get_price
 from card import verification
 from datetime import datetime #za sortiranje transakcija
 from hash import create_hash
