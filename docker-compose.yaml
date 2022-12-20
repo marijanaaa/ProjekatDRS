@@ -46,6 +46,22 @@ services:
       - mongo
     depends_on:
       - db
+  ui:
+    image: ui
+    container_name: ui
+    build: ./UI
+    ports:
+      - 3000:3000
+    volumes:
+      - ./UI/src:/app/src
+    environment:
+      - REACT_APP_NAME=ui
+      - CHOKIDAR_USEPOLLING=true
+    networks:
+      - mongo
+    #env_file:
+    #  - ./.env
+
   
 networks:
   mongo:
