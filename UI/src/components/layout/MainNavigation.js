@@ -28,7 +28,7 @@ function MainNavigation() {
          
           {ctx.isLoggedIn && (
             <li>
-            <Button>Logout</Button>
+             <Button onClick={ctx.logout}>Logout</Button>
             </li>
           )}
         </ul>

@@ -11,7 +11,13 @@ import React, {
   import AuthContext from '../../../store/auth-context';
   import Input from '../input/Input';
   import classes from './LoginForm.module.css';
+  import Modal from "../modals/Modal";
+ 
   
+
+  import useHttp from "../../../hook/useHttp";
+  import { useHistory } from 'react-router-dom';
+import InfModal from '../modals/InfModal';
   const emailReducer = (state, action) => {
     if (action.type === 'USER_INPUT') {
       return { value: action.val, isValid: action.val.includes('@') };
@@ -32,13 +38,25 @@ import React, {
     return { value: '', isValid: false };
   };
   
-  const Login = (props) => {
-    // const [enteredEmail, setEnteredEmail] = useState('');
-    // const [emailIsValid, setEmailIsValid] = useState();
-    // const [enteredPassword, setEnteredPassword] = useState('');
-    // const [passwordIsValid, setPasswordIsValid] = useState();
+  const LoginForm = (props) => {
+    
+    
+    const { isLoading, sendRequest } = useHttp();
+    
+    const [infoData, setInfoData] = useState(null);//da ispise sta se desilo
+
     const [formIsValid, setFormIsValid] = useState(false);
   
+
+    
+    
+
+
+   
+     
+  
+    
+
     const [emailState, dispatchEmail] = useReducer(emailReducer, {
       value: '',
       isValid: null,
@@ -49,7 +67,7 @@ import React, {
     });
   
     const authCtx = useContext(AuthContext);
-  
+    const history = useHistory();
     const emailInputRef = useRef();
     const passwordInputRef = useRef();
   
@@ -98,20 +116,91 @@ import React, {
     const validatePasswordHandler = () => {
       dispatchPassword({ type: 'INPUT_BLUR' });
     };
+
+    
+
+   
   
-    const submitHandler = (event) => {
+    function hideErrorModalHandler() {//da se ukloni prozorcic
+      setInfoData(null);
+   }
+  
+   function hideSuccessModalHandler() { //isto da ukloni prozor sa obavestenjem
+    setInfoData(null);
+    history.replace('/');
+  }
+
+    async function submitHandler(event) {
       event.preventDefault();
-      if (formIsValid) {
-        authCtx.onLogin(emailState.value, passwordState.value);
-      } else if (!emailIsValid) {
-        emailInputRef.current.focus();
-      } else {
-        passwordInputRef.current.focus();
-      }
-    };
+      
+     if(formIsValid){
+     
+      const requestConfig = {
+        url: 'https://react-app-4391d-default-rtdb.firebaseio.com/userss.json',
+        method: "POST",
+        body: JSON.stringify({
+          email:emailState.value,
+          password: passwordState.value,
+         
+          token: true,
+         
+        }
+        ),
+        headers: {
+          "Content-Type": "application/json",
+          //Authorization: "Bearer " + ctx.token,
+        },
+       
+        
+      };
+
+
+      const data = await sendRequest(requestConfig);
+      setInfoData({
+        title: data.hasError ? "Error" : "Success",
+        message: data.hasError ? data.message : "User successfully added",
+      });
+     
+      //u data je ono sto server posalje kao odgovor(u firebase salje name)
+  
+    
+      if(data.name.length === 0){//promeniti u skladu sa odg sa servera
+        authCtx.login(null);
+
+         history.replace("/registration");
+        
+       
+       
+        }
+        else{
+       authCtx.login(data.name);
+        }
+       
+      
+    }
+
+  
+   
+    else if (!emailIsValid) {
+      emailInputRef.current.focus();
+    }
+    else if (!passwordIsValid) {
+      passwordInputRef.current.focus();
+    }
+  }
+
+
   
     return (
       <Card className={classes.login}>
+     {isLoading && <Modal/>}
+       {infoData && (
+        <InfModal
+          title={infoData.title}
+          message={infoData.message}
+          onConfirm={infoData.title === "Error" ?  hideErrorModalHandler : hideSuccessModalHandler}
+        />
+      )}
         <form onSubmit={submitHandler}>
           <Input
             ref={emailInputRef}
@@ -143,5 +232,5 @@ import React, {
     );
   };
   
-  export default Login;
+  export default LoginForm;
   
