@@ -137,7 +137,7 @@ import InfModal from '../modals/InfModal';
      if(formIsValid){
      
       const requestConfig = {
-        url: 'localhost:5000',
+        url: 'http://localhost:5000/login',
         method: "POST",
         body: JSON.stringify({
           email:emailState.value,
@@ -149,12 +149,13 @@ import InfModal from '../modals/InfModal';
         ),
         headers: {
           "Content-Type": "application/json",
-          //Authorization: "Bearer " + ctx.token,
+       
         },
        
         
       };
 
+      //token:true-znaci da ocekuje da nam ga server napravi.
 
       const data = await sendRequest(requestConfig);
       setInfoData({
@@ -164,9 +165,9 @@ import InfModal from '../modals/InfModal';
      
       //u data je ono sto server posalje kao odgovor(u firebase salje name)
   
-    
+    console.log(data.name)
       if(data.name.length === 0){//promeniti u skladu sa odg sa servera
-        authCtx.login(null);
+        authCtx.login(null);//nije uspesno logovanje
 
          history.replace("/registration");
         
@@ -175,6 +176,8 @@ import InfModal from '../modals/InfModal';
         }
         else{
        authCtx.login(data.name);
+      
+
         }
        
       

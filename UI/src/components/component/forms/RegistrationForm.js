@@ -3,11 +3,12 @@ import React, {
     useReducer,
     useRef,
     useEffect,
+    useContext,
   } from 'react';
   import { useHistory } from 'react-router-dom';
   import Card from '../card/Card';
   import Button from '../button/Button';
-  //import AuthContext from '../../../store/auth-context';
+  import AuthContext from '../../../store/auth-context';
   import Input from '../input/Input';
   import classes from './RegistrationForm.module.css';
   import useHttp from "../../../hook/useHttp";
@@ -110,7 +111,7 @@ import React, {
   function RegistrationForm() {
     const history = useHistory();
     const { isLoading, sendRequest } = useHttp(); //koristimo hook koji je odvojen
-   // const ctx = useContext(AuthContext);
+    const ctx = useContext(AuthContext);
     const [infoData, setInfoData] = useState(null);//da ispise sta se desilo
     
 
@@ -345,7 +346,7 @@ import React, {
         ),
         headers: {
           "Content-Type": "application/json",
-          //Authorization: "Bearer " + ctx.token,
+          Authorization: "Bearer " + ctx.token,
         },
        
         
@@ -353,12 +354,19 @@ import React, {
       const data = await sendRequest(requestConfig);
       //ono sto vrati server kao odg
      
-      console.log(data);
+     if(data.result === 'OK'){
       setInfoData({
-        title: data.hasError ? "Error" : "Success",
-        message: data.hasError ? data.message : "User successfully added",
+        title: "Success",
+        message: "User successfully added",
       });
-     
+     }
+
+    else{
+      setInfoData({
+        title: "Error",
+        message: "User don't added",
+      });
+    }
       
     }
     else if (!nameIsValid) {

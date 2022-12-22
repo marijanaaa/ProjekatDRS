@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request,json
 from database import db
 from cryptocurrency import get_assets_coin_cap_API,get_price
 from card import verification
@@ -56,8 +56,7 @@ def user_login():
     email = request.get_json(force=True).get('email')
     password = request.get_json(force=True).get('password')
     user = userCollection.find_one({"email":email, "password": password})
-    return jsonify({'result':user})
-
+    return json.dumps(user, default=str)
     
 
 @app.route('/edit', methods=["PUT"])
