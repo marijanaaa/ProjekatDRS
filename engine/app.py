@@ -8,8 +8,6 @@ from enums import transaction_state
 from flask_cors import CORS
 
 
-
-
 #collections
 userCollection = db["users"]
 transactionCollection = db["transactions"]
@@ -30,7 +28,6 @@ def get_stored_users():
             "isVerified": user["isVerified"]} for user in _users]
     return jsonify({"users": users})
 
-#bez validacija
 @app.route('/registration', methods=['POST'])
 def user_registration():
     name = request.get_json(force=True).get('name')
@@ -41,38 +38,44 @@ def user_registration():
     number = request.get_json(force=True).get('number')
     email = request.get_json(force=True).get('email')
     password = request.get_json(force=True).get('password')
-    userCollection.insert_one({'name':name,'lastname':lastname,'address':address,'city':city,'country':country,
-                              'number':number,'email':email,'password':password,'isVerified':False})
+    result = userCollection.insert_one({'name':name,'lastname':lastname,'address':address,'city':city,'country':country,
+                              'number':number,'email':email,'password':password,'isVerified':False,
+                              'cryptocurrencies':{
+                                'BTC':0,
+                                'ETH':0,
+                                'USDT':0,
+                                'BUSD':0,
+                                'DOGE':0
+                              }})
+    if result != None:
+        return jsonify({'result':'OK'})
+    return jsonify({'result':'ERROR'})
     
-    status = "Successfully registered!"
-    return jsonify({'result': status}) 
-    #sta funkcija vraca
-
-#provere fale
 @app.route('/login', methods=["POST"])
 def user_login():
-    email = request.form.get('email')
-    password = request.form.get('password')
+    email = request.get_json(force=True).get('email')
+    password = request.get_json(force=True).get('password')
     user = userCollection.find_one({"email":email, "password": password})
-    return jsonify(user) #treba vratiti usera da bi mogla da se ucita stranica sa svim njegovim balansom
-    #na online racunu
+    return jsonify({'result':user})
 
-@app.route('/edit', methods=["POST"])
+    
+
+@app.route('/edit', methods=["PUT"])
 def edit_profile():
-    name = request.form.get('name')
-    lastname = request.form.get('lastname')
-    address = request.form.get('address')
-    town = request.form.get('town')
-    state = request.form.get('state')
-    number = request.form.get('number')
-    email = request.form.get('email')
-    password = request.form.get('password')
+    name = request.get_json(force=True).get('name')
+    lastname = request.get_json(force=True).get('lastname')
+    address = request.get_json(force=True).get('address')
+    city = request.get_json(force=True).get('city')
+    country = request.get_json(force=True).get('country')
+    number = request.get_json(force=True).get('number')
+    email = request.get_json(force=True).get('email')
+    password = request.get_json(force=True).get('password')
+
     query={'_id':2}
-    new_values={"$set":{'name':name,'lastname':lastname,'address':address,'town':town,'state':state,
-           'number':number,'email':email,'password':password,'isVerified':True}}
-    userCollection.update_one(query,new_values)
-    return "maja"
-    #sta fja vraca
+    new_values={"$set":{'name':name,'lastname':lastname,'address':address,'city':city,'country':country,
+           'number':number,'email':email,'password':password}}
+    return jsonify({'result':userCollection.update_one(query,new_values)})
+
 
 @app.route('/verification', methods=["POST"])
 def user_verification():
