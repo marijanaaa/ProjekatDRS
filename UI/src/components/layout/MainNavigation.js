@@ -25,6 +25,11 @@ function MainNavigation() {
             </li>
           )}
         
+        {ctx.isLoggedIn && (
+            <li>
+              <Link to="/balance">Account Balance</Link>
+            </li>
+        )}
          
           {ctx.isLoggedIn && (
             <li>

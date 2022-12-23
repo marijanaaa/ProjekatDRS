@@ -6,6 +6,7 @@ import LoginPage from "./pages/LoginPage";
 import AuthContext from "./store/auth-context";
 import HomePage from "./pages/HomePage";
 import RegistrationPage from "./pages/RegistrationPage";
+import AccountBalancePage from "./pages/AccountBalancePage";
 
 function App() {
   const ctx = useContext(AuthContext);
@@ -28,7 +29,10 @@ function App() {
           {ctx.isLoggedIn && <Redirect to="/" />}
         </Route>
        
-       
+        <Route path="/balance">
+        {ctx.isLoggedIn && <AccountBalancePage />}
+          {!ctx.isLoggedIn && <Redirect to="/" />}
+        </Route>
       </Switch>
     </React.Fragment>
   );
