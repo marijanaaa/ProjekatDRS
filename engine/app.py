@@ -39,7 +39,7 @@ def user_registration():
     email = request.get_json(force=True).get('email')
     password = request.get_json(force=True).get('password')
     result = userCollection.insert_one({'name':name,'lastname':lastname,'address':address,'city':city,'country':country,
-                              'number':number,'email':email,'password':password,'isVerified':False,
+                              'number':number,'email':email,'password':password,'isVerified':False, 'balanceInDollars':0,
                               'cryptocurrencies':{
                                 'BTC':0,
                                 'ETH':0,

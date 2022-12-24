@@ -67,6 +67,8 @@ export const AuthContextProvider = (props) => {
       number: data.number,
       email: data.email,
       password: data.password,
+      balanceInDollars: data.balanceInDollars,
+      cryptocurrencies : data.cryptocurrencies,
          
     };
     setUser(newUser);
