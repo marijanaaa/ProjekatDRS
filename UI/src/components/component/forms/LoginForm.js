@@ -158,27 +158,34 @@ import InfModal from '../modals/InfModal';
       //token:true-znaci da ocekuje da nam ga server napravi.
 
       const data = await sendRequest(requestConfig);
-      setInfoData({
-        title: data.hasError ? "Error" : "Success",
-        message: data.hasError ? data.message : "User successfully added",
-      });
+     
      
       //u data je ono sto server posalje kao odgovor(u firebase salje name)
   
-    console.log(data.name)
-      if(data.name.length === 0){//promeniti u skladu sa odg sa servera
+    
+    
+      if(data.length === 0){//promeniti u skladu sa odg sa servera
+       
         authCtx.login(null);//nije uspesno logovanje
-
+        setInfoData({
+          title:  "Error",
+          message: "Error in login",
+        });
          history.replace("/registration");
         
        
        
         }
         else{
-       authCtx.login(data.name);
+       authCtx.login(data); //za sada ce to biti neki token, kasnije ce to biti 
+       setInfoData({
+        title:  "Success",
+        message: "Succesfuly!",
+      });
       
 
         }
+
        
       
     }

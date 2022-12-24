@@ -27,6 +27,13 @@ function MainNavigation() {
         
         {ctx.isLoggedIn && (
             <li>
+              <Link to="/profile">Profile</Link>
+            </li>
+        )}
+
+
+        {ctx.isLoggedIn && (
+            <li>
               <Link to="/balance">Account Balance</Link>
             </li>
         )}

@@ -5,15 +5,16 @@ import React, { useState, useEffect, useCallback } from 'react';
 const AuthContext = React.createContext({
   token: '',
   isLoggedIn: false,
-  login: (token) => {},
+  login: (data) => {},
   logout: () => {},
+  user: {},
 });
 
 
 
 const retrieveStoredToken = () => {
   const storedToken = localStorage.getItem('token');
-  console.log(storedToken);
+  
 
   return {
     token: storedToken,
@@ -21,7 +22,13 @@ const retrieveStoredToken = () => {
   };
 };
 
+const initialUser = localStorage.getItem("user");
+
+
 export const AuthContextProvider = (props) => {
+  const [user, setUser] = useState(
+    initialUser !== null && JSON.parse(initialUser)
+  );
   const tokenData = retrieveStoredToken();
   
   let initialToken;
@@ -37,15 +44,33 @@ export const AuthContextProvider = (props) => {
   const logoutHandler = useCallback(() => {
     setToken(null);
     localStorage.removeItem('token');
-  
+   
+    setUser(null);
+    
+    localStorage.removeItem("user");
 
     
   }, []);
 
-  const loginHandler = (token) => {
-   // console.log(token); taj token je prenesen iz LoginForme i ovde se cuva
-    setToken(token);
-    localStorage.setItem('token', token);
+  const loginHandler = (data) => {
+   // console.log(token); taj token je prenesen iz LoginForme i ovde se cuva(za sad pisem name dok marijana ne generise token)
+    setToken(data.name);
+    localStorage.setItem('token', data.name);
+    const newUser = {
+      _id: data._id,
+      name: data.name,
+      lastname: data.lastname,
+      address: data.address,
+      city: data.city,
+
+      country: data.country,
+      number: data.number,
+      email: data.email,
+      password: data.password,
+         
+    };
+    setUser(newUser);
+    localStorage.setItem("user", JSON.stringify(newUser));
     
      
     
@@ -53,6 +78,8 @@ export const AuthContextProvider = (props) => {
     
   };
 
+
+  
   useEffect(() => {
     if (tokenData) {
       console.log(tokenData.duration);
@@ -65,6 +92,7 @@ export const AuthContextProvider = (props) => {
     isLoggedIn: userIsLoggedIn,
     login: loginHandler,
     logout: logoutHandler,
+    user: user,
   };
 
   return (

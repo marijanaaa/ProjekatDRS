@@ -9,12 +9,19 @@
   .actions {
     text-align: center;
   }
-
-  .account {
+  .account{
     width: 100%;
     max-width: 40rem;
     margin: 2rem auto;
-    padding: 2rem;
+    padding: 2rem; 
+    color: #4a1188;
+
+  }
+  .profile{
+    width: 100%;
+    max-width: 40rem;
+    margin: 2rem auto;
+    padding: 2rem; 
+    color: #4a1188;
     
   }
-  
