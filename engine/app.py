@@ -25,6 +25,23 @@ app.config["SECRET_KEY"] = "004f2af45d3a4e161a7dd2d17fdae47f"
 app.config["JWT_ACCESS_TOKEN_EXPIRES"] = datetime.timedelta(hours=1)
 _jwt = JWTManager(app)
 
+def token_required(f):
+   @wraps(f)
+   def decorator(*args, **kwargs):
+       token = None
+       if 'Authorization' in request.headers:
+           token = request.headers['Authorization']
+ 
+       if not token:
+           return jsonify({'message': 'a valid token is missing'})
+       try:
+           data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=["HS256"])
+           current_user = userCollection.find_one({"_id": data['_id']})
+       except:
+           return jsonify({'message': 'token is invalid'})
+ 
+       return f(current_user, *args, **kwargs)
+   return decorator
 
 @app.after_request
 def refresh_expiring_jwts(response):
@@ -96,15 +113,11 @@ def user_login():
         access_token = create_access_token(identity=email)
         json_string_token =  '{"token":"%s"}' % (access_token)
         dict_token = json.loads(json_string_token)
+        
+        dict_user["password"] = password
         merged_dict = {key: value for (key, value) in (list(dict_user.items()) + list(dict_token.items()))}
     return json.dumps(merged_dict, default=json)
     
-
-@app.route("/logout", methods=["POST"])
-def logout():
-    response = jsonify({"msg": "logout successful"})
-    unset_jwt_cookies(response)
-    return response
 
 @app.route('/edit', methods=["PUT"])
 @jwt_required()

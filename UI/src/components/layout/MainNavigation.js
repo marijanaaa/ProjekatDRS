@@ -31,6 +31,11 @@ function MainNavigation() {
             </li>
         )}
 
+        {ctx.isLoggedIn && (
+            <li>
+              <Link to="/edit">Change Profile</Link>
+            </li>
+        )}
 
         {ctx.isLoggedIn && (
             <li>

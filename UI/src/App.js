@@ -9,6 +9,7 @@ import RegistrationPage from "./pages/RegistrationPage";
 import AccountBalancePage from "./pages/AccountBalancePage";
 
 import ProfilePage from "./pages/ProfilePage";
+import ChangeProfilePage from "./pages/ChangeProfilePage";
 function App() {
   const ctx = useContext(AuthContext);
   //const userIsAdmin = ctx.user !== null && ctx.user.userType === "ADMIN";
@@ -34,6 +35,12 @@ function App() {
         {ctx.isLoggedIn && <ProfilePage />}
           {!ctx.isLoggedIn && <Redirect to="/" />}
         </Route>
+
+        <Route path="/edit">
+        {ctx.isLoggedIn && <ChangeProfilePage />}
+          {!ctx.isLoggedIn && <Redirect to="/" />}
+        </Route>
+
 
         <Route path="/balance">
         {ctx.isLoggedIn && <AccountBalancePage />}

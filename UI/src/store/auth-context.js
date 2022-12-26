@@ -7,6 +7,7 @@ const AuthContext = React.createContext({
   isLoggedIn: false,
   login: (data) => {},
   logout: () => {},
+  update: (data) => {},
   user: {},
 });
 
@@ -41,6 +42,29 @@ export const AuthContextProvider = (props) => {
   const userIsLoggedIn = !!token;
 
 
+  const updateHandler = (data) => {
+    console.log(data.password)
+    console.log(data.name)
+      const newUser = { _id: user._id,
+         name: data.name,
+         lastname: data.lastname, 
+         address: data.address, 
+         city: data.city,
+          country: data.country, 
+          number: data.number, 
+          email: data.email,
+           password: data.password ,
+           balanceInDollars: user.balanceInDollars,
+           cryptocurrencies : user.cryptocurrencies,};
+           setUser(newUser);
+           console.log()
+      localStorage.setItem("user", JSON.stringify(newUser));
+    
+     
+    
+  }
+
+
   const logoutHandler = useCallback(() => {
     setToken(null);
     localStorage.removeItem('token');
@@ -55,7 +79,9 @@ export const AuthContextProvider = (props) => {
   const loginHandler = (data) => {
    // console.log(token); taj token je prenesen iz LoginForme i ovde se cuva(za sad pisem name dok marijana ne generise token)
     setToken(data.token);
-    localStorage.setItem('token', token);
+    localStorage.setItem('token', data.token);
+    console.log(data.password)
+    console.log(data.name)
     const newUser = {
       _id: data._id,
       name: data.name,
@@ -72,6 +98,8 @@ export const AuthContextProvider = (props) => {
          
     };
     setUser(newUser);
+    
+    console.log()
     localStorage.setItem("user", JSON.stringify(newUser));
     
      
@@ -94,6 +122,7 @@ export const AuthContextProvider = (props) => {
     isLoggedIn: userIsLoggedIn,
     login: loginHandler,
     logout: logoutHandler,
+    update: updateHandler,
     user: user,
   };
 

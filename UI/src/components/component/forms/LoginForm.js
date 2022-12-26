@@ -160,8 +160,8 @@ import InfModal from '../modals/InfModal';
      
       //u data je ono sto server posalje kao odgovor(u firebase salje name)
   
-    
-    
+     
+   
       if(data.length === 0){//promeniti u skladu sa odg sa servera
        
         authCtx.login(null);//nije uspesno logovanje
@@ -180,7 +180,7 @@ import InfModal from '../modals/InfModal';
         title:  "Success",
         message: "Succesfuly!",
       });
-
+     
         }
 
        
