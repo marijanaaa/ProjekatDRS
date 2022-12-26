@@ -148,8 +148,7 @@ import InfModal from '../modals/InfModal';
         }
         ),
         headers: {
-          "Content-Type": "application/json",
-       
+          "Content-Type": "application/json"
         },
        
         
@@ -158,7 +157,6 @@ import InfModal from '../modals/InfModal';
       //token:true-znaci da ocekuje da nam ga server napravi.
 
       const data = await sendRequest(requestConfig);
-     
      
       //u data je ono sto server posalje kao odgovor(u firebase salje name)
   
@@ -182,7 +180,6 @@ import InfModal from '../modals/InfModal';
         title:  "Success",
         message: "Succesfuly!",
       });
-      
 
         }
 

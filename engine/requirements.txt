@@ -4,3 +4,5 @@ requests
 pycryptodome
 crypto
 flask-cors
+pyjwt
+datetime

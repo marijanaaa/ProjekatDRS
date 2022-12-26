@@ -2,10 +2,14 @@ from flask import Flask, jsonify, request,json
 from database import db
 from cryptocurrency import get_assets_coin_cap_API,get_price
 from card import verification
-from datetime import datetime #za sortiranje transakcija
+import datetime
 from hash import create_hash
 from enums import transaction_state
 from flask_cors import CORS
+import jwt
+from werkzeug.security import generate_password_hash,check_password_hash
+from functools import wraps
+import uuid
 
 
 #collections
@@ -14,6 +18,28 @@ transactionCollection = db["transactions"]
 
 app = Flask(__name__)
 CORS(app)
+
+app.config["SECRET_KEY"] = "004f2af45d3a4e161a7dd2d17fdae47f"
+
+
+def token_required(f):
+   @wraps(f)
+   def decorator(*args, **kwargs):
+       token = None
+       if 'x-access-tokens' in request.headers:
+           token = request.headers['x-access-tokens']
+ 
+       if not token:
+           return jsonify({'message': 'a valid token is missing'})
+       try:
+           data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=["HS256"])
+           current_user = userCollection.find_one({"_id": data['public_id']})
+       except:
+           return jsonify({'message': 'token is invalid'})
+ 
+       return f(current_user, *args, **kwargs)
+   return decorator
+
 
 @app.route('/')
 def ping_server():
@@ -38,8 +64,9 @@ def user_registration():
     number = request.get_json(force=True).get('number')
     email = request.get_json(force=True).get('email')
     password = request.get_json(force=True).get('password')
+    hashed_password = generate_password_hash(password, method='sha256')
     result = userCollection.insert_one({'name':name,'lastname':lastname,'address':address,'city':city,'country':country,
-                              'number':number,'email':email,'password':password,'isVerified':False, 'balanceInDollars':0,
+                              'number':number,'email':email,'password':hashed_password,'isVerified':False, 'balanceInDollars':0,
                               'cryptocurrencies':{
                                 'BTC':0,
                                 'ETH':0,
@@ -49,17 +76,33 @@ def user_registration():
                               }})
     if result != None:
         return jsonify({'result':'OK'})
-    return jsonify({'result':'ERROR'})
+    return jsonify({'result':'ERROR'}) #pravi od json stringa flask response
     
 @app.route('/login', methods=["POST"])
 def user_login():
+    auth = request.authorization
+    if not auth or not auth.username or not auth.password: 
+       return jsonify({'result':'ERROR'})
     email = request.get_json(force=True).get('email')
     password = request.get_json(force=True).get('password')
-    user = userCollection.find_one({"email":email, "password": password})
-    return json.dumps(user, default=str)
+    user = userCollection.find_one({"email":email})
+    user = json.dumps(user, default=str) #napravim json format od objekta
+    dict_user = json.loads(user) #napravim dictionary od tog objekta
+    merged_dict = {} 
+    print(dict_user["password"])
+    print(password)
+    if check_password_hash(dict_user['password'], password):
+       print("hello")
+       token = jwt.encode({'_id' : dict_user['_id'], 'exp' : datetime.datetime.utcnow() + datetime.timedelta(minutes=45)}, app.config['SECRET_KEY'], "HS256")
+       json_string_token =  '{"token":"%s"}' % (token)
+       dict_token = json.loads(json_string_token)
+       merged_dict = {key: value for (key, value) in (list(dict_user.items()) + list(dict_token.items()))}
+
+# string dump of the merged dict
+    return json.dumps(merged_dict, default=json)
     
 
-@app.route('/edit', methods=["PUT"])
+@app.route('/edit', methods=["PUT"])#mozda post
 def edit_profile():
     name = request.get_json(force=True).get('name')
     lastname = request.get_json(force=True).get('lastname')
@@ -69,11 +112,23 @@ def edit_profile():
     number = request.get_json(force=True).get('number')
     email = request.get_json(force=True).get('email')
     password = request.get_json(force=True).get('password')
+    hashed_password = generate_password_hash(password, method='sha256')
 
-    query={'_id':2}
+    user = userCollection.find_one({"email":email})
+    user = json.dumps(user, default=str) #napravim json format od objekta
+    dict_user = json.loads(user) #napravim dictionary od tog objekta
+
+    query={'email': email}
     new_values={"$set":{'name':name,'lastname':lastname,'address':address,'city':city,'country':country,
-           'number':number,'email':email,'password':password}}
-    return jsonify({'result':userCollection.update_one(query,new_values)})
+           'number':number,'email':email,'password':hashed_password}}
+    
+    result = userCollection.update_one(query,new_values)
+    if result.matched_count > 0:
+        return jsonify({"name": name, "lastname": lastname,
+            "address":address, "city":city, "country":country,
+            "number": number,"email":email,"password": password, 
+            "isVerified": dict_user["isVerified"]})
+    return jsonify({"result":"ERROR"})
 
 
 @app.route('/verification', methods=["POST"])

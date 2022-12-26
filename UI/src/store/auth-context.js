@@ -54,8 +54,8 @@ export const AuthContextProvider = (props) => {
 
   const loginHandler = (data) => {
    // console.log(token); taj token je prenesen iz LoginForme i ovde se cuva(za sad pisem name dok marijana ne generise token)
-    setToken(data.name);
-    localStorage.setItem('token', data.name);
+    setToken(data.token);
+    localStorage.setItem('token', token);
     const newUser = {
       _id: data._id,
       name: data.name,
