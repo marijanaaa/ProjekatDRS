@@ -151,17 +151,20 @@ def edit_profile():
 
 @app.route('/verification', methods=["POST"])
 def user_verification():
-    user_id = request.form.get('id')
-    number = request.form.get('number')
-    name = request.form.get('name')
-    expiration_date = request.form.get('expiration_date')
-    security_code = request.form.get('security_code')
-    result = verification(number, name, expiration_date, security_code)
-    if(result == True):
+    email = request.get_json(force=True).get('email')
+    number = request.get_json(force=True).get('number')
+    name = request.get_json(force=True).get('name')
+    expiration_date = request.get_json(force=True).get('expiration_date')
+    security_code = request.get_json(force=True).get('security_code')
+    isVerified = verification(number, name, expiration_date, security_code)
+    if(isVerified == True):
         #verifikovati korisnika u bazi
-        query={'_id':user_id}
+        query={'email':email}
         new_value = {"$set":{'isVerfied':True}}
-    return result
+        result = userCollection.update_one(query,new_value)
+    if result.matched_count > 0:
+        return jsonify({"result":"OK"})
+    return jsonify({"result":"ERROR"})
 
 #prebacivanje sa platne kartice na crypto racun, Nela radi
 #ubaciti sockete tu
