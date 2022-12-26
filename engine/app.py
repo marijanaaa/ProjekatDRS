@@ -89,10 +89,7 @@ def user_login():
     user = json.dumps(user, default=str) #napravim json format od objekta
     dict_user = json.loads(user) #napravim dictionary od tog objekta
     merged_dict = {} 
-    print(dict_user["password"])
-    print(password)
     if check_password_hash(dict_user['password'], password):
-       print("hello")
        token = jwt.encode({'_id' : dict_user['_id'], 'exp' : datetime.datetime.utcnow() + datetime.timedelta(minutes=45)}, app.config['SECRET_KEY'], "HS256")
        json_string_token =  '{"token":"%s"}' % (token)
        dict_token = json.loads(json_string_token)
@@ -102,7 +99,7 @@ def user_login():
     return json.dumps(merged_dict, default=json)
     
 
-@app.route('/edit', methods=["PUT"])#mozda post
+@app.route('/edit', methods=["PUT"])
 def edit_profile():
     name = request.get_json(force=True).get('name')
     lastname = request.get_json(force=True).get('lastname')
