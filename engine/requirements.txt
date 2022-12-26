@@ -6,3 +6,4 @@ crypto
 flask-cors
 pyjwt
 datetime
+flask-jwt-extended

@@ -10,6 +10,8 @@ import jwt
 from werkzeug.security import generate_password_hash,check_password_hash
 from functools import wraps
 import uuid
+from flask_jwt_extended import create_access_token,get_jwt,get_jwt_identity, \
+                               unset_jwt_cookies, jwt_required, JWTManager
 
 
 #collections
@@ -20,26 +22,43 @@ app = Flask(__name__)
 CORS(app)
 
 app.config["SECRET_KEY"] = "004f2af45d3a4e161a7dd2d17fdae47f"
-
+app.config["JWT_ACCESS_TOKEN_EXPIRES"] = datetime.timedelta(hours=1)
+_jwt = JWTManager(app)
 
 def token_required(f):
    @wraps(f)
    def decorator(*args, **kwargs):
        token = None
-       if 'x-access-tokens' in request.headers:
-           token = request.headers['x-access-tokens']
+       if 'Authorization' in request.headers:
+           token = request.headers['Authorization']
  
        if not token:
            return jsonify({'message': 'a valid token is missing'})
        try:
            data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=["HS256"])
-           current_user = userCollection.find_one({"_id": data['public_id']})
+           current_user = userCollection.find_one({"_id": data['_id']})
        except:
            return jsonify({'message': 'token is invalid'})
  
        return f(current_user, *args, **kwargs)
    return decorator
 
+@app.after_request
+def refresh_expiring_jwts(response):
+    try:
+        exp_timestamp = get_jwt()["exp"]
+        now = datetime.datetime.now(datetime.timezone.utc)
+        target_timestamp = datetime.datetime.timestamp(now + datetime.timedelta(minutes=30))
+        if target_timestamp > exp_timestamp:
+            access_token = create_access_token(identity=get_jwt_identity())
+            data = response.get_json()
+            if type(data) is dict:
+                data["access_token"] = access_token 
+                response.data = json.dumps(data)
+        return response
+    except (RuntimeError, KeyError):
+        # Case where there is not a valid JWT. Just return the original respone
+        return response
 
 @app.route('/')
 def ping_server():
@@ -80,26 +99,26 @@ def user_registration():
     
 @app.route('/login', methods=["POST"])
 def user_login():
-    auth = request.authorization
-    if not auth or not auth.username or not auth.password: 
-       return jsonify({'result':'ERROR'})
     email = request.get_json(force=True).get('email')
     password = request.get_json(force=True).get('password')
+
     user = userCollection.find_one({"email":email})
     user = json.dumps(user, default=str) #napravim json format od objekta
     dict_user = json.loads(user) #napravim dictionary od tog objekta
-    merged_dict = {} 
-    if check_password_hash(dict_user['password'], password):
-       token = jwt.encode({'_id' : dict_user['_id'], 'exp' : datetime.datetime.utcnow() + datetime.timedelta(minutes=45)}, app.config['SECRET_KEY'], "HS256")
-       json_string_token =  '{"token":"%s"}' % (token)
-       dict_token = json.loads(json_string_token)
-       merged_dict = {key: value for (key, value) in (list(dict_user.items()) + list(dict_token.items()))}
 
-# string dump of the merged dict
+    merged_dict = {} 
+    if email != dict_user["email"]:
+        return {"msg": "Wrong email"}, 401
+    if check_password_hash(dict_user['password'], password):
+        access_token = create_access_token(identity=email)
+        json_string_token =  '{"token":"%s"}' % (access_token)
+        dict_token = json.loads(json_string_token)
+        merged_dict = {key: value for (key, value) in (list(dict_user.items()) + list(dict_token.items()))}
     return json.dumps(merged_dict, default=json)
     
 
 @app.route('/edit', methods=["PUT"])
+@jwt_required()
 def edit_profile():
     name = request.get_json(force=True).get('name')
     lastname = request.get_json(force=True).get('lastname')
