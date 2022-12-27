@@ -12,4 +12,10 @@ def get_price(data,symbol):
         if element["symbol"]==symbol:
             return element["priceUsd"]
     
+def get_coins_from_dollars(dollars,symbol):
+    price_of_symbol=get_price(get_assets_coin_cap_API(),symbol)
+    return dollars//price_of_symbol
+    
+
+
 
