@@ -150,53 +150,60 @@ def edit_profile():
 
 
 @app.route('/verification', methods=["POST"])
-@jwt_required()
 def user_verification():
     email = request.get_json(force=True).get('email')
     number = request.get_json(force=True).get('number')
     name = request.get_json(force=True).get('name')
     expiration_date = request.get_json(force=True).get('expiration_date')
+    list = expiration_date.split('-')
+    year = list[0]
+    month = list[1]
+    day = list[2]
     security_code = request.get_json(force=True).get('security_code')
-    isVerified = verification(number, name, expiration_date, security_code)
+    isVerified = verification(number, name, year, month, day, security_code)
     if(isVerified == True):
         #verifikovati korisnika u bazi
         query={'email':email}
         new_value = {"$set":{'isVerfied':True}}
         result = userCollection.update_one(query,new_value)
-    if result.matched_count > 0:
-         return jsonify({'result':'OK'})
-    return jsonify({'result':'ERROR'})
+        if result.matched_count > 0:
+            return jsonify({"result":"OK"})
+    return jsonify({"result":"ERROR"})
 
-#prebacivanje sa platne kartice na crypto racun, Nela radi
-#ubaciti sockete tu
 @app.route('/cardTransaction', methods=["POST"])
 def card_transaction():
+    email = request.get_json(force=True).get('email')
+    amount_in_dollars = request.get_json(force=True).get('dollars')
+    currency = request.get_json(force=True).get('currency')
     return "maja"
 
 @app.route('/getTransactions', methods=["GET"])
 def get_transactions():
-    user_id = request.form.get('id')
-    collection = transactionCollection.find({"userId": user_id})
-    return collection
+    email = request.get_json(force=True).get('email')
+    collection = transactionCollection.find({"email": email})
+    return json.dumps(collection, default=json)
+
 
 @app.route('/sortTransactions', methods=["GET"])
 def sort_transactions():
-    user_id = request.form.get('id')
-    collection = transactionCollection.find({"userId": user_id})
+    email = request.get_json(force=True).get('email')
+    collection = transactionCollection.find({"email": email})
     dates=[]
     #treba vidjeti kakav ce format datuma biti
     for date in collection:
         dates.append(date)
-    dates.sort(key = lambda date: datetime.strptime(date, '%d %b %Y'))
-    return dates
+    dates.sort(key = lambda date: datetime.datetime.strptime(date, '%d %b %Y'))
+    return json.dumps(dates,default=str)
 
 #u zavisnosti po cemu ce se filtrirati, ja cu ovde samo po stanju transakcije npr za slucaj odbijeno
 @app.route('/filterTransactions/denied', methods=["GET"])
 def filter_transactions():
-    user_id = request.form.get('id')
-    transaction_state = request.form.get('transactionState')
-    collection = transactionCollection.find({"transactionState": transaction_state})
-    return collection
+    email = request.get_json(force=True).get('email')
+    transaction_state = request.get_json(force=True).get('transactionState')
+    #hocemo sve transakcije koje je inicirao ili primao
+    collection = transactionCollection.find({"sender": email}, {"receiver":email}, 
+                                            {"transactionState":transaction_state})
+    return json.dumps(collection, default=json)
 
 #iniciranje nove transakcije drugom korisniku koji ima otvoren on-line racun
 #u sustini prebacivanje sa svog na drugi on-line racun
@@ -204,15 +211,17 @@ def filter_transactions():
 #treba napraviti provere postojanja korisnika
 @app.route('/newTransaction',methods=["POST"])
 def new_transaction():
-    #receiver id cemo dobiti dobavljanjem preko njegovog email-a
-    sender_id = request.form.get('id')
-    receiver_email = request.form.get('email')
-    amount = request.form.get('amount')
-    cryptocurrency = request.form.get('cryptocurrency')
+    sender_email = request.get_json(force=True).get('sender_email')
+    receiver_email = request.get_json(force=True).get('receiver_email')
+    amount = request.get_json(force=True).get('amount')
+    cryptocurrency = request.get_json(force=True).get('cryptocurrency')
     #treba proveriti da li taj email postoji
-    receiver_id = userCollection.find_one({"email": receiver_email})
-    hash = create_hash(sender_id, receiver_id, amount)
-    userCollection.insert_one({'hash':hash,'sender':sender_id,'receiver':receiver_id,
+    user = userCollection.find_one({"email":receiver_email})
+    if user == None:
+        return jsonify({"result":"ERROR"})
+
+    hash = create_hash(sender_email, receiver_email, amount)
+    userCollection.insert_one({'hash':hash,'sender':sender_email,'receiver':receiver_email,
                                'cryptocurrency':cryptocurrency,'amount':amount,'state': transaction_state.PROCESSING})
     #stanje na pocetku je u obradi pa se kasnije mijenja u zavisnoti od vremena  ! ! !
 
