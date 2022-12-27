@@ -1,6 +1,6 @@
 from flask import Flask, jsonify, request,json
 from database import db
-from cryptocurrency import get_assets_coin_cap_API,get_price
+from cryptocurrency import get_assets_coin_cap_API,get_price,get_coins_from_dollars
 from card import verification
 import datetime
 from hash import create_hash
@@ -175,7 +175,8 @@ def card_transaction():
     email = request.get_json(force=True).get('email')
     amount_in_dollars = request.get_json(force=True).get('dollars')
     currency = request.get_json(force=True).get('currency')
-    return "maja"
+    result = get_coins_from_dollars(amount_in_dollars, currency)
+    return jsonify({"result":result})
 
 @app.route('/getTransactions', methods=["GET"])
 def get_transactions():
@@ -193,7 +194,7 @@ def sort_transactions():
     for date in collection:
         dates.append(date)
     dates.sort(key = lambda date: datetime.datetime.strptime(date, '%d %b %Y'))
-    return json.dumps(dates,default=str)
+    return json.dumps(dates)
 
 #u zavisnosti po cemu ce se filtrirati, ja cu ovde samo po stanju transakcije npr za slucaj odbijeno
 @app.route('/filterTransactions/denied', methods=["GET"])
