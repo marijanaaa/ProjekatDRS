@@ -11,7 +11,7 @@ function ProfilePage(){
     const country = authCtx.user.country;
     const number = authCtx.user.number;
     const email = authCtx.user.email;
-    const password = authCtx.user.password
+    
 
     return(
         <>
@@ -35,9 +35,7 @@ function ProfilePage(){
           <label style={{ fontWeight: 'bold' }}>Number: </label>{number}
           <h2></h2>
           <label style={{ fontWeight: 'bold' }}>Email: </label>{email}
-          <h2></h2>
-          <label style={{ fontWeight: 'bold' }}>Password: </label>{password}
-          
+         
         </div>
       </Card>
     </>

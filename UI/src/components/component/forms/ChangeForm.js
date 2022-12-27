@@ -122,42 +122,42 @@ import React, {
   
     const [nameState, dispatchName] = useReducer(nameReducer, {
       value: ctx.user.name,
-      isValid: null,
+      isValid: true,
     });
     const [lastNameState, dispatchLastName] = useReducer(lastNameReducer, {
       value: ctx.user.lastname,
-      isValid: null,
+      isValid: true,
     });
 
     const [addressState, dispatchAddress] = useReducer(addressReducer, {
       value: ctx.user.address,
-      isValid: null,
+      isValid: true,
     });
 
     const [cityState, dispatchCity] = useReducer(cityReducer, {
       value: ctx.user.city,
-      isValid: null,
+      isValid: true,
     });
 
     const [countryState, dispatchCountry] = useReducer(countryReducer, {
       value: ctx.user.country,
-      isValid: null,
+      isValid: true,
     });
 
     const [numberState, dispatchNumber] = useReducer(numberReducer, {
       value: ctx.user.number,
-      isValid: null,
+      isValid: true,
     });
 
 
     const [emailState, dispatchEmail] = useReducer(emailReducer, {
       value: ctx.user.email,
-      isValid: null,
+      isValid: true,
     });
 
     const [passwordState, dispatchPassword] = useReducer(passwordReducer, {
       value: ctx.user.password,
-      isValid: null,
+      isValid: true,
     });
 
 

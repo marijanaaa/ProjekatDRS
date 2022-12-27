@@ -233,7 +233,7 @@ import InfModal from '../modals/InfModal';
         authCtx.verify();
        setInfoData({
         title:  "Success",
-        message: "Succesfuly!",
+        message: "1$ has been successfully deducted from your card!",
       });
      
         }
@@ -295,7 +295,7 @@ import InfModal from '../modals/InfModal';
             ref={dateInputRef}
             id="date"
             label="Date"
-            type="text"
+            type="date"
             isValid={dateIsValid}
             value={dateState.value}
             onChange={dateChangeHandler}
