@@ -43,6 +43,13 @@ function MainNavigation() {
             </li>
         )}
          
+
+         {!ctx.isVerify && ctx.isLoggedIn && (
+            <li>
+              <Link to="/verification">Verification</Link>
+            </li>
+        )}
+
           {ctx.isLoggedIn && (
             <li>
              <Button onClick={ctx.logout}>Logout</Button>

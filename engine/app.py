@@ -150,6 +150,7 @@ def edit_profile():
 
 
 @app.route('/verification', methods=["POST"])
+@jwt_required()
 def user_verification():
     email = request.get_json(force=True).get('email')
     number = request.get_json(force=True).get('number')
@@ -163,8 +164,8 @@ def user_verification():
         new_value = {"$set":{'isVerfied':True}}
         result = userCollection.update_one(query,new_value)
     if result.matched_count > 0:
-        return jsonify({"result":"OK"})
-    return jsonify({"result":"ERROR"})
+         return jsonify({'result':'OK'})
+    return jsonify({'result':'ERROR'})
 
 #prebacivanje sa platne kartice na crypto racun, Nela radi
 #ubaciti sockete tu

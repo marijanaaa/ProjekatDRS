@@ -5,8 +5,10 @@ import React, { useState, useEffect, useCallback } from 'react';
 const AuthContext = React.createContext({
   token: '',
   isLoggedIn: false,
+  isVerify: false,
   login: (data) => {},
   logout: () => {},
+  verify: () => {},
   update: (data) => {},
   user: {},
 });
@@ -40,7 +42,7 @@ export const AuthContextProvider = (props) => {
   const [token, setToken] = useState(initialToken);
 
   const userIsLoggedIn = !!token;
-
+  const [userIsVerify, setUserVer] = useState(false);
 
   const updateHandler = (data) => {
     console.log(data.password)
@@ -64,6 +66,12 @@ export const AuthContextProvider = (props) => {
     
   }
 
+  const verifyHandler = useCallback(() => {
+  setUserVer(true);
+
+    
+  }, []);
+  
 
   const logoutHandler = useCallback(() => {
     setToken(null);
@@ -120,9 +128,11 @@ export const AuthContextProvider = (props) => {
   const contextValue = {
     token: token,
     isLoggedIn: userIsLoggedIn,
+    isVerify : userIsVerify, 
     login: loginHandler,
     logout: logoutHandler,
     update: updateHandler,
+    verify : verifyHandler,
     user: user,
   };
 
