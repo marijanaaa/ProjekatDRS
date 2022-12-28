@@ -7,3 +7,4 @@ flask-cors
 pyjwt
 datetime
 flask-jwt-extended
+flask_sock

@@ -12,7 +12,9 @@ from functools import wraps
 import uuid
 from flask_jwt_extended import create_access_token,get_jwt,get_jwt_identity, \
                                unset_jwt_cookies, jwt_required, JWTManager
-
+import transaction_class
+import threading
+from flask_sock import Sock
 
 #collections
 userCollection = db["users"]
@@ -20,10 +22,11 @@ transactionCollection = db["transactions"]
 
 app = Flask(__name__)
 CORS(app)
-
+sockets=Sock(app)
 app.config["SECRET_KEY"] = "004f2af45d3a4e161a7dd2d17fdae47f"
 app.config["JWT_ACCESS_TOKEN_EXPIRES"] = datetime.timedelta(hours=1)
 _jwt = JWTManager(app)
+parametrs = None
 
 def token_required(f):
    @wraps(f)
@@ -216,15 +219,21 @@ def new_transaction():
     receiver_email = request.get_json(force=True).get('receiver_email')
     amount = request.get_json(force=True).get('amount')
     cryptocurrency = request.get_json(force=True).get('cryptocurrency')
-    #treba proveriti da li taj email postoji
-    user = userCollection.find_one({"email":receiver_email})
-    if user == None:
-        return jsonify({"result":"ERROR"})
+    global parametrs
+    parametrs={"sender_email":sender_email,"receiver_email":receiver_email,"amount":amount,"cryptocurrency":cryptocurrency}
+    return jsonify({"result":"OK"})
 
-    hash = create_hash(sender_email, receiver_email, amount)
-    userCollection.insert_one({'hash':hash,'sender':sender_email,'receiver':receiver_email,
-                               'cryptocurrency':cryptocurrency,'amount':amount,'state': transaction_state.PROCESSING})
-    #stanje na pocetku je u obradi pa se kasnije mijenja u zavisnoti od vremena  ! ! !
+@sockets.route("/verifysocket")
+def verify_notification(sockets):
+    if parametrs!= None:
+        t1 = threading.Thread(target=transaction_class.transaction_processing, args=(parametrs,))
+        t1.start()
+        t1.join()
+        result= t1.value
+        if result==True:
+            sockets.send(jsonify({"result":"OK"}))
+        else:
+            sockets.send(jsonify({"result":"ERROR"}))
 
 
 if __name__=='__main__':
