@@ -5,7 +5,7 @@ import classes from "../components/component/forms/LoginForm.module.css";
 import Card from "../components/component/card/Card";
 import PayFromCardForm from "../components/component/forms/PayFromCardForm";
 
-function ExchangeOffice() {
+function ExchangeOfficePage() {
 
     return (
         <Card className={classes.account}>
@@ -14,4 +14,4 @@ function ExchangeOffice() {
     );
 }
 
-export default ExchangeOffice;
+export default ExchangeOfficePage;

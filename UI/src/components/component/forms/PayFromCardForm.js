@@ -14,6 +14,34 @@ import Modal from "../modals/Modal";
 import useHttp from "../../../hook/useHttp";
 import { useHistory } from 'react-router-dom';
 import InfModal from '../modals/InfModal';
+import Select from '../input/Select';
+
+
+
+const CURRENCY= [
+    {
+      id: 1,
+      name: "BTC",
+    },
+    {
+      id: 2,
+      name: "ETH",
+    },
+    {
+        id: 3,
+        name: "USDT",
+      },
+      {
+        id: 4,
+        name: "BUSD",
+      },
+      {
+        id: 5,
+        name: "DOGE",
+      },
+  ];
+  
+
 const amountReducer = (state, action) => {
     if (action.type === 'USER_INPUT') {
         return { value: action.val, isValid: action.val.trim().length > 0 };
@@ -23,6 +51,16 @@ const amountReducer = (state, action) => {
     }
     return { value: '', isValid: false };
 };
+const currencyReducer = (state, action) => {
+    if (action.type === 'USER_INPUT') {
+        return { value: action.val, isValid: action.val.trim().length > 0 };
+    }
+    if (action.type === 'INPUT_BLUR') {
+        return { value: state.value, isValid: state.value.trim().length > 0 };
+    }
+    return { value: '', isValid: false };
+};
+
 
 function PayFromCardForm() {
 
@@ -38,17 +76,14 @@ function PayFromCardForm() {
         isValid: null,
     });
 
-    const [currencyState, dispatchCurrency] = useReducer(currencyReducer, {
-        value: '',
-        isValid: null,
-    });
+   
 
     const authCtx = useContext(AuthContext);
     const amountInputRef = useRef();
     const currencyInputRef = useRef();
 
     const { isValid: amountIsValid } = amountState;
-    const { isValid: currencyIsValid } = currencyState;
+  
 
     useEffect(() => {
         const identifier = setTimeout(() => {
@@ -60,23 +95,18 @@ function PayFromCardForm() {
             console.log('CLEANUP');
             clearTimeout(identifier);
         };
-    }, [amountIsValid, currencyIsValid]);
+    }, [amountIsValid]);
 
     const amountChangeHandler = (event) => {
         dispatchAmount({ type: 'USER_INPUT', val: event.target.value });
     };
 
-    const currencyChangeHandler = (event) => {
-        dispatchAmount({ type: 'USER_INPUT', val: event.target.value });
-    };
-
-    const validateCurrencyHandler = () => {
-        dispatchCurrency({ type: 'INPUT_BLUR' });
-    };
-
     const validateAmountHandler = () => {
         dispatchAmount({ type: 'INPUT_BLUR' });
-    };
+      };
+
+
+   
 
     function hideErrorModalHandler() {//da se ukloni prozorcic
         setInfoData(null);
@@ -98,7 +128,7 @@ function PayFromCardForm() {
                 body: JSON.stringify({
                     email: authCtx.user.email,
                     dollars: amountState.value,
-                    currency: currencyState.value,
+                    currency: currencyInputRef.current.value,
                 }
                 ),
                 headers: {
@@ -126,6 +156,8 @@ function PayFromCardForm() {
         else if (!amountIsValid) {
             amountInputRef.current.focus();
         }
+        
+    }
 
         return (
             <Card className={classes.login}>
@@ -148,12 +180,14 @@ function PayFromCardForm() {
                         onChange={amountChangeHandler}
                         onBlur={validateAmountHandler}
                     />
-                    <select id='currency' label='currency' isValid={currencyIsValid} value={currencyState.value} onBlur={validateAmountHandler}>
-                        {
-                            Object.entries(authCtx.user.cryptocurrencies)
-                                .map(([key, value]) => <option value={key}>{key} : {value}</option>)
-                        }
-                    </select>
+                    
+                    
+                    <Select
+                   ref={currencyInputRef}
+                   id="currency"
+                  label="Currency:"
+                   items={CURRENCY}
+                    />
 
                     <div className={classes.actions}>
                         <Button type="submit" className={classes.btn}>
@@ -163,7 +197,7 @@ function PayFromCardForm() {
                 </form>
             </Card>
         );
-    };
+    
 }
 
 export default PayFromCardForm;
