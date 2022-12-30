@@ -179,6 +179,26 @@ def user_verification():
 def card_transaction():
     email = request.get_json(force=True).get('email')
     amount_in_dollars = request.get_json(force=True).get('dollars')
+    obj = {'email':email,'dollars':0,'BTC':0,'ETH':0,'USDT':0,'BUSD':0,'DOGE':0}
+    obj['dollars'] = amount_in_dollars
+    crypto_coll = cryptocurrencyCollection.find_one({'email':email})
+    if crypto_coll == None:
+        result = cryptocurrencyCollection.insert_one(obj)
+        if result != None:
+            return jsonify({'result':'OK'})
+        return jsonify({'result':'ERROR'})
+    query={'email':email}
+    new_value = {"$set":{'dollars':amount_in_dollars}}
+    result = userCollection.update_one(query,new_value)
+    if result.matched_count > 0:
+        return jsonify({"result":"OK"})
+    return jsonify({"result":"ERROR"})
+
+@app.route('/exchangeDollarsToCrypto', methods=["POST"])
+@jwt_required()
+def exhange_dollars_to_crypto():
+    email = request.get_json(force=True).get('email')
+    amount_in_dollars = request.get_json(force=True).get('dollars')
     currency = request.get_json(force=True).get('currency')
     coin_amount = get_coins_from_dollars(amount_in_dollars, currency)
     email_exists = cryptocurrencyCollection.find_one({'email':email})
@@ -193,7 +213,7 @@ def card_transaction():
     return jsonify({"result":"ERROR"})
 
 @app.route('/getAccountBalance')
-@jwt_required
+@jwt_required()
 def get_account_balance():
     email = request.get_json(force=True).get('email')
     account_balance = cryptocurrencyCollection.find_one({"email":email})
