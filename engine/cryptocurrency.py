@@ -14,7 +14,7 @@ def get_price(data,symbol):
     
 def get_coins_from_dollars(dollars,symbol):
     price_of_symbol=get_price(get_assets_coin_cap_API(),symbol)
-    return dollars//price_of_symbol
+    return float(dollars)/float(price_of_symbol)
     
 
 

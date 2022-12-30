@@ -19,6 +19,7 @@ from flask_sock import Sock
 #collections
 userCollection = db["users"]
 transactionCollection = db["transactions"]
+cryptocurrencyCollection = db["cryptocurrencies"]
 
 app = Flask(__name__)
 CORS(app)
@@ -98,7 +99,7 @@ def user_registration():
                               }})
     if result != None:
         return jsonify({'result':'OK'})
-    return jsonify({'result':'ERROR'}) #pravi od json stringa flask response
+    return jsonify({'result':'ERROR'}) 
     
 @app.route('/login', methods=["POST"])
 def user_login():
@@ -106,8 +107,8 @@ def user_login():
     password = request.get_json(force=True).get('password')
 
     user = userCollection.find_one({"email":email})
-    user = json.dumps(user, default=str) #napravim json format od objekta
-    dict_user = json.loads(user) #napravim dictionary od tog objekta
+    user = json.dumps(user, default=str) 
+    dict_user = json.loads(user) 
 
     merged_dict = {} 
     if email != dict_user["email"]:
@@ -136,8 +137,8 @@ def edit_profile():
     hashed_password = generate_password_hash(password, method='sha256')
 
     user = userCollection.find_one({"email":email})
-    user = json.dumps(user, default=str) #napravim json format od objekta
-    dict_user = json.loads(user) #napravim dictionary od tog objekta
+    user = json.dumps(user, default=str)
+    dict_user = json.loads(user)
 
     query={'email': email}
     new_values={"$set":{'name':name,'lastname':lastname,'address':address,'city':city,'country':country,
@@ -153,6 +154,7 @@ def edit_profile():
 
 
 @app.route('/verification', methods=["POST"])
+@jwt_required()
 def user_verification():
     email = request.get_json(force=True).get('email')
     number = request.get_json(force=True).get('number')
@@ -165,7 +167,6 @@ def user_verification():
     security_code = request.get_json(force=True).get('security_code')
     isVerified = verification(number, name, year, month, day, security_code)
     if(isVerified == True):
-        #verifikovati korisnika u bazi
         query={'email':email}
         new_value = {"$set":{'isVerfied':True}}
         result = userCollection.update_one(query,new_value)
@@ -174,12 +175,54 @@ def user_verification():
     return jsonify({"result":"ERROR"})
 
 @app.route('/cardTransaction', methods=["POST"])
+@jwt_required()
 def card_transaction():
     email = request.get_json(force=True).get('email')
     amount_in_dollars = request.get_json(force=True).get('dollars')
     currency = request.get_json(force=True).get('currency')
-    result = get_coins_from_dollars(amount_in_dollars, currency)
-    return jsonify({"result":result})
+    coin_amount = get_coins_from_dollars(amount_in_dollars, currency)
+    email_exists = cryptocurrencyCollection.find_one({'email':email})
+    if email_exists == None:
+        result = insert_cryptocurrency(email, currency, coin_amount)
+        if result != None:
+            return jsonify({'result':'OK'})
+        return jsonify({'result':'ERROR'})
+    result = update_cryptocurrency(email, currency, coin_amount)
+    if result.matched_count > 0:
+            return jsonify({"result":"OK"})
+    return jsonify({"result":"ERROR"})
+
+@app.route('/getAccountBalance')
+@jwt_required
+def get_account_balance():
+    email = request.get_json(force=True).get('email')
+    account_balance = cryptocurrencyCollection.find_one({"email":email})
+    if account_balance != None: 
+        return json.dumps(account_balance, default=str)
+    return jsonify({'result':'ERROR'})
+
+
+def update_cryptocurrency(email, currency, amount):
+    query={'email':email}
+    new_value = {"$set":{currency:amount}}
+    result = cryptocurrencyCollection.update_one(query,new_value)
+    return result
+
+def insert_cryptocurrency(email, currency, amount):
+    obj = {'email':email,'dollars':0,'BTC':0,'ETH':0,'USDT':0,'BUSD':0,'DOGE':0}
+    if currency == 'BTC':
+        obj['BTC'] = amount
+    elif currency == 'ETH':
+        obj['ETH'] = amount
+    elif currency == 'USDT':
+        obj['USDT'] = amount
+    elif currency == 'BUSD':
+        obj['BUSD'] = amount
+    elif currency == 'DOGE':
+        obj['DOGE'] = amount
+    result = cryptocurrencyCollection.insert_one(obj)
+    return result
+
 
 @app.route('/getTransactions', methods=["GET"])
 def get_transactions():
@@ -193,26 +236,19 @@ def sort_transactions():
     email = request.get_json(force=True).get('email')
     collection = transactionCollection.find({"email": email})
     dates=[]
-    #treba vidjeti kakav ce format datuma biti
     for date in collection:
         dates.append(date)
     dates.sort(key = lambda date: datetime.datetime.strptime(date, '%d %b %Y'))
     return json.dumps(dates)
 
-#u zavisnosti po cemu ce se filtrirati, ja cu ovde samo po stanju transakcije npr za slucaj odbijeno
 @app.route('/filterTransactions/denied', methods=["GET"])
 def filter_transactions():
     email = request.get_json(force=True).get('email')
     transaction_state = request.get_json(force=True).get('transactionState')
-    #hocemo sve transakcije koje je inicirao ili primao
     collection = transactionCollection.find({"sender": email}, {"receiver":email}, 
                                             {"transactionState":transaction_state})
     return json.dumps(collection, default=json)
 
-#iniciranje nove transakcije drugom korisniku koji ima otvoren on-line racun
-#u sustini prebacivanje sa svog na drugi on-line racun
-#socketi
-#treba napraviti provere postojanja korisnika
 @app.route('/newTransaction',methods=["POST"])
 def new_transaction():
     sender_email = request.get_json(force=True).get('sender_email')
