@@ -51,6 +51,11 @@ function App() {
         {ctx.isLoggedIn && <AccountBalancePage />}
           {!ctx.isLoggedIn && <Redirect to="/" />}
         </Route>
+
+        <Route path="/exchange">
+        {ctx.isLoggedIn && ctx.isVerify && <ExchangeOffice />}
+          {!ctx.isLoggedIn && <Redirect to="/" />}
+        </Route>
       </Switch>
     </React.Fragment>
   );

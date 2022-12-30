@@ -49,6 +49,11 @@ function MainNavigation() {
               <Link to="/verification">Verification</Link>
             </li>
         )}
+        {ctx.isVerify && ctx.isLoggedIn && (
+            <li>
+              <Link to="/exchange">Exchange Office</Link>
+            </li>
+        )}
 
           {ctx.isLoggedIn && (
             <li>
