@@ -29,27 +29,10 @@ app.config["JWT_ACCESS_TOKEN_EXPIRES"] = datetime.timedelta(hours=1)
 _jwt = JWTManager(app)
 parametrs = None
 
-def token_required(f):
-   @wraps(f)
-   def decorator(*args, **kwargs):
-       token = None
-       if 'Authorization' in request.headers:
-           token = request.headers['Authorization']
- 
-       if not token:
-           return jsonify({'message': 'a valid token is missing'})
-       try:
-           data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=["HS256"])
-           current_user = userCollection.find_one({"_id": data['_id']})
-       except:
-           return jsonify({'message': 'token is invalid'})
- 
-       return f(current_user, *args, **kwargs)
-   return decorator
-
 @app.after_request
 def refresh_expiring_jwts(response):
     try:
+        print("BLABLABLA")
         exp_timestamp = get_jwt()["exp"]
         now = datetime.datetime.now(datetime.timezone.utc)
         target_timestamp = datetime.datetime.timestamp(now + datetime.timedelta(minutes=30))
@@ -64,19 +47,6 @@ def refresh_expiring_jwts(response):
         # Case where there is not a valid JWT. Just return the original respone
         return response
 
-@app.route('/')
-def ping_server():
-    return "Welcome to cryptocurrency."
-
-@app.route('/users')
-def get_stored_users():
-    _users = userCollection.find({})
-    users = [{"id": user["_id"], "name": user["name"], "lastname": user["lastname"],
-            "address":user["address"], "town":user["town"], "state":user["state"],
-            "number": user["number"],"email": user["email"], "password": user["password"], 
-            "isVerified": user["isVerified"]} for user in _users]
-    return jsonify({"users": users})
-
 @app.route('/registration', methods=['POST'])
 def user_registration():
     name = request.get_json(force=True).get('name')
@@ -88,15 +58,9 @@ def user_registration():
     email = request.get_json(force=True).get('email')
     password = request.get_json(force=True).get('password')
     hashed_password = generate_password_hash(password, method='sha256')
-    result = userCollection.insert_one({'name':name,'lastname':lastname,'address':address,'city':city,'country':country,
-                              'number':number,'email':email,'password':hashed_password,'isVerified':False, 'balanceInDollars':0,
-                              'cryptocurrencies':{
-                                'BTC':0,
-                                'ETH':0,
-                                'USDT':0,
-                                'BUSD':0,
-                                'DOGE':0
-                              }})
+    result = userCollection.insert_one({'name':name,'lastname':lastname,'address':address,'city':city,
+                                        'country':country,'number':number,'email':email,'password':hashed_password,
+                                        'isVerified':False})
     if result != None:
         return jsonify({'result':'OK'})
     return jsonify({'result':'ERROR'}) 
@@ -189,7 +153,7 @@ def card_transaction():
         return jsonify({'result':'ERROR'})
     query={'email':email}
     new_value = {"$set":{'dollars':amount_in_dollars}}
-    result = userCollection.update_one(query,new_value)
+    result = cryptocurrencyCollection.update_one(query,new_value)
     if result.matched_count > 0:
         return jsonify({"result":"OK"})
     return jsonify({"result":"ERROR"})
