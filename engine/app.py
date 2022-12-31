@@ -151,8 +151,15 @@ def card_transaction():
         if result != None:
             return jsonify({'result':'OK'})
         return jsonify({'result':'ERROR'})
+    #increasing dollar amount in collection
+    result = cryptocurrencyCollection.find_one({"email":email})
+    result = json.dumps(result, default=str)
+    result_dict = json.loads(result)
+    old_amount = float(result_dict["dollars"])
+    new_amount = float(amount_in_dollars) + old_amount
+    #updating dollar amount
     query={'email':email}
-    new_value = {"$set":{'dollars':amount_in_dollars}}
+    new_value = {"$set":{'dollars':new_amount}}
     result = cryptocurrencyCollection.update_one(query,new_value)
     if result.matched_count > 0:
         return jsonify({"result":"OK"})
@@ -161,10 +168,12 @@ def card_transaction():
 @app.route('/exchangeDollarsToCrypto', methods=["POST"])
 @jwt_required()
 def exhange_dollars_to_crypto():
+    #need to decrease amount in dollars when crypto currency is bought!
     email = request.get_json(force=True).get('email')
     amount_in_dollars = request.get_json(force=True).get('dollars')
     currency = request.get_json(force=True).get('currency')
     coin_amount = get_coins_from_dollars(amount_in_dollars, currency)
+    #need to update old crypto amount adding new amount
     email_exists = cryptocurrencyCollection.find_one({'email':email})
     if email_exists == None:
         result = insert_cryptocurrency(email, currency, coin_amount)
