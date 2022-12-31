@@ -183,6 +183,11 @@ def get_account_balance():
     account_balance = cryptocurrencyCollection.find_one({"email":email})
     if account_balance != None: 
         return json.dumps(account_balance, default=str)
+    obj = {'email':email,'dollars':0,'BTC':0,'ETH':0,'USDT':0,'BUSD':0,'DOGE':0}
+    result = cryptocurrencyCollection.insert_one(obj)#if in collection doesnt exist that email we should return 
+    #initial object with all zeros
+    if result != None:
+        return json.dumps(obj, default=str)
     return jsonify({'result':'ERROR'})
 
 
