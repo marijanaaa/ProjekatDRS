@@ -51,16 +51,14 @@ const amountReducer = (state, action) => {
     }
     return { value: '', isValid: false };
 };
-const currencyReducer = (state, action) => {
-    if (action.type === 'USER_INPUT') {
-        return { value: action.val, isValid: action.val.trim().length > 0 };
-    }
-    if (action.type === 'INPUT_BLUR') {
-        return { value: state.value, isValid: state.value.trim().length > 0 };
-    }
-    return { value: '', isValid: false };
-};
 
+  
+//<Select
+//ref={currencyInputRef}
+//id="currency"
+//label="Currency:"
+//items={CURRENCY}
+// />
 
 function PayFromCardForm() {
 
@@ -80,7 +78,7 @@ function PayFromCardForm() {
 
     const authCtx = useContext(AuthContext);
     const amountInputRef = useRef();
-    const currencyInputRef = useRef();
+    //const currencyInputRef = useRef();
 
     const { isValid: amountIsValid } = amountState;
   
@@ -128,26 +126,28 @@ function PayFromCardForm() {
                 body: JSON.stringify({
                     email: authCtx.user.email,
                     dollars: amountState.value,
-                    currency: currencyInputRef.current.value,
+                   // currency: currencyInputRef.current.value,
                 }
                 ),
                 headers: {
-                    "Content-Type": "application/json"
+                    "Content-Type": "application/json",
+                    Authorization: "Bearer " + authCtx.token,
+
                 },
             };
             const data = await sendRequest(requestConfig);
 
-            if (data.length === 0) {//promeniti u skladu sa odg sa servera
+            if (data.result === 'ERROR') {//promeniti u skladu sa odg sa servera
                 setInfoData({
                     title: "Error",
-                    message: "Error in transaction",
+                    message: "Payment error",
                 });
 
             }
             else {
                 setInfoData({
                     title: "Success",
-                    message: "Succesfuly!",
+                    message: "Money successfully deposited into the account!",
                 });
 
             }
@@ -181,13 +181,7 @@ function PayFromCardForm() {
                         onBlur={validateAmountHandler}
                     />
                     
-                    
-                    <Select
-                   ref={currencyInputRef}
-                   id="currency"
-                  label="Currency:"
-                   items={CURRENCY}
-                    />
+                  
 
                     <div className={classes.actions}>
                         <Button type="submit" className={classes.btn}>

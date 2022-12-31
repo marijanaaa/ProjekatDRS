@@ -176,7 +176,7 @@ def exhange_dollars_to_crypto():
             return jsonify({"result":"OK"})
     return jsonify({"result":"ERROR"})
 
-@app.route('/getAccountBalance')
+@app.route('/getAccountBalance',methods=["POST"] )
 @jwt_required()
 def get_account_balance():
     email = request.get_json(force=True).get('email')

@@ -44,8 +44,8 @@ function App() {
         </Route>
 
         <Route path="/verification">
-        {ctx.isLoggedIn && <VerificationPage />}
-          {!ctx.isLoggedIn && <Redirect to="/" />}
+        {ctx.isLoggedIn && !ctx.isVerify && <VerificationPage />}
+          {!ctx.isLoggedIn  && <Redirect to="/" />}
         </Route>
 
         <Route path="/balance">

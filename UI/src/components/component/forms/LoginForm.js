@@ -160,26 +160,31 @@ import InfModal from '../modals/InfModal';
      
       //u data je ono sto server posalje kao odgovor(u firebase salje name)
   
-     
-   
-      if(data.length === 0){//promeniti u skladu sa odg sa servera
+      var count = Object.keys(data).length; 
+
+      if(count !== 0 ){//promeniti u skladu sa odg sa servera
        
-        authCtx.login(null);//nije uspesno logovanje
+        authCtx.login(data); //za sada ce to biti neki token, kasnije ce to biti 
         setInfoData({
-          title:  "Error",
-          message: "Error in login",
-        });
-         history.replace("/registration");
-        
+         title:  "Success",
+         message: "Succesfuly!",
+       });
        
        
         }
         else{
-       authCtx.login(data); //za sada ce to biti neki token, kasnije ce to biti 
-       setInfoData({
-        title:  "Success",
-        message: "Succesfuly!",
-      });
+
+
+         
+          setInfoData({
+            title:  "Error",
+            message: "Error in login",
+          });
+          
+          
+
+
+      
      
         }
 

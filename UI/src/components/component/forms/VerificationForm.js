@@ -215,7 +215,7 @@ import InfModal from '../modals/InfModal';
       //u data je ono sto server posalje kao odgovor(u firebase salje name)
   
      
-   console.log(data);
+  
       if(data.result === 'ERROR'){//promeniti u skladu sa odg sa servera
        
        //nije uspesno logovanje
@@ -236,6 +236,7 @@ import InfModal from '../modals/InfModal';
         message: "1$ has been successfully deducted from your card!",
       });
      
+      history.replace("/");
         }
 
        
