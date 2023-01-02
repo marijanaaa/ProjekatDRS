@@ -1,7 +1,7 @@
 from enums import transaction_state
 from app import transactionCollection,create_hash,userCollection
 import time
-import datetime
+from datetime import datetime
 
 def transaction_processing(parametrs):
     user = userCollection.find_one({"email":parametrs["receiver_email"]})
