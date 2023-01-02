@@ -165,10 +165,7 @@ import InfModal from '../modals/InfModal';
       if(count !== 0 ){//promeniti u skladu sa odg sa servera
        
         authCtx.login(data); //za sada ce to biti neki token, kasnije ce to biti 
-        setInfoData({
-         title:  "Success",
-         message: "Succesfuly!",
-       });
+      
        
        
         }
@@ -178,7 +175,7 @@ import InfModal from '../modals/InfModal';
          
           setInfoData({
             title:  "Error",
-            message: "Error in login",
+            message: "You entered the wrong email or password!",
           });
           
           

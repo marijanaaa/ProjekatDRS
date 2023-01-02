@@ -51,7 +51,7 @@ function MainNavigation() {
         )}
         {ctx.isVerify && ctx.isLoggedIn && (
             <li>
-              <Link to="/exchange">Exchange Office</Link>
+              <Link to="/pay">Pay from card</Link>
             </li>
         )}
 

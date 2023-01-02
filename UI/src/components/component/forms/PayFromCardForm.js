@@ -14,32 +14,11 @@ import Modal from "../modals/Modal";
 import useHttp from "../../../hook/useHttp";
 import { useHistory } from 'react-router-dom';
 import InfModal from '../modals/InfModal';
-import Select from '../input/Select';
 
 
 
-const CURRENCY= [
-    {
-      id: 1,
-      name: "BTC",
-    },
-    {
-      id: 2,
-      name: "ETH",
-    },
-    {
-        id: 3,
-        name: "USDT",
-      },
-      {
-        id: 4,
-        name: "BUSD",
-      },
-      {
-        id: 5,
-        name: "DOGE",
-      },
-  ];
+
+
   
 
 const amountReducer = (state, action) => {
@@ -53,19 +32,14 @@ const amountReducer = (state, action) => {
 };
 
   
-//<Select
-//ref={currencyInputRef}
-//id="currency"
-//label="Currency:"
-//items={CURRENCY}
-// />
+
 
 function PayFromCardForm() {
 
     const history = useHistory();
-    const { isLoading, sendRequest } = useHttp(); //koristimo hook koji je odvojen
-    const ctx = useContext(AuthContext);
-    const [infoData, setInfoData] = useState(null);//da ispise sta se desilo
+    const { isLoading, sendRequest } = useHttp(); 
+   
+    const [infoData, setInfoData] = useState(null);
 
     const [formIsValid, setFormIsValid] = useState(false);
 
@@ -147,7 +121,7 @@ function PayFromCardForm() {
             else {
                 setInfoData({
                     title: "Success",
-                    message: "Money successfully deposited into the account!",
+                    message: "Money successfully paid into the account!",
                 });
 
             }
@@ -173,7 +147,7 @@ function PayFromCardForm() {
                     <Input
                         ref={amountInputRef}
                         id="dollars"
-                        label="Amount"
+                        label="Amount($):"
                         type="text"
                         isValid={amountIsValid}
                         value={amountState.value}

@@ -357,7 +357,7 @@ import React, {
      if(data.result === 'OK'){
       setInfoData({
         title: "Success",
-        message: "User successfully added",
+        message: "User successfully registered",
       });
      
      }
@@ -365,7 +365,7 @@ import React, {
     else{
       setInfoData({
         title: "Error",
-        message: "User don't added",
+        message: "User don't registered!",
       });
     }
       

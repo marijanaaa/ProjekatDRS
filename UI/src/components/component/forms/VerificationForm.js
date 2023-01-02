@@ -212,16 +212,16 @@ import InfModal from '../modals/InfModal';
 
       const data = await sendRequest(requestConfig);
      
-      //u data je ono sto server posalje kao odgovor(u firebase salje name)
+     
   
      
   
-      if(data.result === 'ERROR'){//promeniti u skladu sa odg sa servera
+      if(data.result === 'ERROR'){
        
        //nije uspesno logovanje
         setInfoData({
           title:  "Error",
-          message: "Error ",
+          message: "Card does not exist! ",
         });
          history.replace("/verification");
         
@@ -229,7 +229,7 @@ import InfModal from '../modals/InfModal';
        
         }
         else{
-       //za sada ce to biti neki token, kasnije ce to biti 
+      
         authCtx.verify();
        setInfoData({
         title:  "Success",
