@@ -54,6 +54,11 @@ function MainNavigation() {
               <Link to="/pay">Pay from card</Link>
             </li>
         )}
+        {ctx.isVerify && ctx.isLoggedIn && (
+            <li>
+              <Link to="/exchange">By currencies</Link>
+            </li>
+        )}
 
           {ctx.isLoggedIn && (
             <li>
