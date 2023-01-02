@@ -166,6 +166,7 @@ def card_transaction():
         return jsonify({"result":"OK"})
     return jsonify({"result":"ERROR"})
 
+
 @app.route('/exchangeDollarsToCrypto', methods=["POST"])
 @jwt_required()
 def exhange_dollars_to_crypto():
@@ -173,17 +174,29 @@ def exhange_dollars_to_crypto():
     email = request.get_json(force=True).get('email')
     amount_in_dollars = request.get_json(force=True).get('dollars')
     currency = request.get_json(force=True).get('currency')
+
+    email_exists = cryptocurrencyCollection.find_one({'email':email})
     coin_amount = get_coins_from_dollars(amount_in_dollars, currency)
     #need to update old crypto amount adding new amount
-    email_exists = cryptocurrencyCollection.find_one({'email':email})
+    
     if email_exists == None:
-        result = insert_cryptocurrency(email, currency, coin_amount)
-        if result != None:
+        result = insert_cryptocurrency(email, currency, coin_amount, amount_in_dollars)
+        res = json.dumps(email_exists, default=str)
+        result_dict = json.loads(res)
+        if float(result_dict["dollars"]) < float(amount_in_dollars):
+            return jsonify({'result':'ERROR'})
+        res = decrease_dollar_amount(email, amount_in_dollars)
+        if result != None and res == "OK":
             return jsonify({'result':'OK'})
         return jsonify({'result':'ERROR'})
+    res = json.dumps(email_exists, default=str)
+    result_dict = json.loads(res)
+    if float(result_dict["dollars"]) < float(amount_in_dollars):
+        return jsonify({'result':'ERROR'})
     result = update_cryptocurrency(email, currency, coin_amount)
-    if result.matched_count > 0:
-            return jsonify({"result":"OK"})
+    res = decrease_dollar_amount(email, amount_in_dollars)
+    if result.matched_count > 0 and res == "OK":
+        return jsonify({"result":"OK"})
     return jsonify({"result":"ERROR"})
 
 @app.route('/getAccountBalance',methods=["POST"] )
@@ -200,25 +213,43 @@ def get_account_balance():
         return json.dumps(obj, default=str)
     return jsonify({'result':'ERROR'})
 
-
-def update_cryptocurrency(email, currency, amount):
+def decrease_dollar_amount(email, amount_in_dollars):
+    result = cryptocurrencyCollection.find_one({"email":email})
+    result = json.dumps(result, default=str)
+    result_dict = json.loads(result)
+    old_amount = float(result_dict["dollars"])
+    new_amount = old_amount - float(amount_in_dollars)
+    #updating dollar amount
     query={'email':email}
-    new_value = {"$set":{currency:amount}}
+    new_value = {"$set":{'dollars':new_amount}}
+    result = cryptocurrencyCollection.update_one(query,new_value)
+    if result.matched_count > 0:
+        return "OK"
+    return "ERROR"
+
+def update_cryptocurrency(email, currency, coin_amount):
+    result = cryptocurrencyCollection.find_one({"email":email})
+    result = json.dumps(result, default=str)
+    result_dict = json.loads(result)
+    old_coin_amount = float(result_dict[currency])
+    new_coin_amount = float(coin_amount) + old_coin_amount
+    query={'email':email}
+    new_value = {"$set":{currency:new_coin_amount}}
     result = cryptocurrencyCollection.update_one(query,new_value)
     return result
 
-def insert_cryptocurrency(email, currency, amount):
+def insert_cryptocurrency(email, currency, coin_amount):
     obj = {'email':email,'dollars':0,'BTC':0,'ETH':0,'USDT':0,'BUSD':0,'DOGE':0}
     if currency == 'BTC':
-        obj['BTC'] = amount
+        obj['BTC'] = coin_amount
     elif currency == 'ETH':
-        obj['ETH'] = amount
+        obj['ETH'] = coin_amount
     elif currency == 'USDT':
-        obj['USDT'] = amount
+        obj['USDT'] = coin_amount
     elif currency == 'BUSD':
-        obj['BUSD'] = amount
+        obj['BUSD'] = coin_amount
     elif currency == 'DOGE':
-        obj['DOGE'] = amount
+        obj['DOGE'] = coin_amount
     result = cryptocurrencyCollection.insert_one(obj)
     return result
 
