@@ -15,6 +15,7 @@ from flask_jwt_extended import create_access_token,get_jwt,get_jwt_identity, \
 import transaction_class
 import threading
 from flask_sock import Sock
+from function_for_sorting import sort_transactions_up, sort_transactions_down
 
 #collections
 userCollection = db["users"]
@@ -229,15 +230,17 @@ def get_transactions():
     return json.dumps(collection, default=json)
 
 
-@app.route('/sortTransactions', methods=["GET"])
+@app.route('/sortTransactions', methods=["POST"])
 def sort_transactions():
+    factor = request.get_json(force=True).get('factor')
     email = request.get_json(force=True).get('email')
     collection = transactionCollection.find({"email": email})
-    dates=[]
-    for date in collection:
-        dates.append(date)
-    dates.sort(key = lambda date: datetime.datetime.strptime(date, '%d %b %Y'))
-    return json.dumps(dates)
+    collection=json.dumps(collection)
+    if factor=="true":
+        result=sort_transactions_up(json.loads(collection))
+    else:
+        result=sort_transactions_down(json.loads(collection))
+    return json.dumps(result,default=json)
 
 @app.route('/filterTransactions/denied', methods=["GET"])
 def filter_transactions():
