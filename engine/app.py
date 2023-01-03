@@ -16,6 +16,7 @@ import transaction_class
 import threading
 from flask_sock import Sock
 from function_for_sorting import sort_transactions_up, sort_transactions_down,sort_transaction_date_up,sort_transaction_date_down
+from function_for_filtering import filtering_amount,filtering_datetime
 
 #collections
 userCollection = db["users"]
