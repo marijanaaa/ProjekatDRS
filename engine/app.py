@@ -2,7 +2,7 @@ from flask import Flask, jsonify, request,json
 from database import db
 from cryptocurrency import get_assets_coin_cap_API,get_price,get_coins_from_dollars,exchange_cryptocurrency
 from card import verification
-import datetime
+from datetime import datetime
 from hash import create_hash
 from enums import transaction_state
 from flask_cors import CORS
@@ -313,13 +313,24 @@ def sort_transactions():
         result=sort_transaction_date_down(json.loads(collection))
     return json.dumps(result,default=json)
 
-@app.route('/filterTransactions/denied', methods=["GET"])
+@app.route('/filterTransactions', methods=["GET"])
 def filter_transactions():
     email = request.get_json(force=True).get('email')
-    transaction_state = request.get_json(force=True).get('transactionState')
-    collection = transactionCollection.find({"sender": email}, {"receiver":email}, 
-                                            {"transactionState":transaction_state})
-    return json.dumps(collection, default=json)
+    #transaction_state = request.get_json(force=True).get('transactionState')
+    factor=request.get_json(force=True).get('facotr')
+    collection = transactionCollection.find({"sender": email}, {"receiver":email})
+    collection=json.dumps(collection)
+    if factor == "datetime":
+        date=request.get_json(force=True).get('date')
+        date=datetime.strptime(date,"%m-%d-%y")
+        result=filtering_datetime(date,json.loads(collection))
+        return json.dumps(result,default=json)
+    else:
+        min=float(request.get_json(force=True).get('min'))
+        max=float(request.get_json(force=True).get('max'))
+        result=filtering_amount(min,max,json.loads(collection))
+        return json.dumps(result,default=json)
+
 
 @app.route('/newTransaction',methods=["POST"])
 def new_transaction():
