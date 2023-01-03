@@ -1,6 +1,6 @@
 from flask import Flask, jsonify, request,json
 from database import db
-from cryptocurrency import get_assets_coin_cap_API,get_price,get_coins_from_dollars
+from cryptocurrency import get_assets_coin_cap_API,get_price,get_coins_from_dollars,exchange_cryptocurrency
 from card import verification
 import datetime
 from hash import create_hash
@@ -166,7 +166,23 @@ def card_transaction():
         return jsonify({"result":"OK"})
     return jsonify({"result":"ERROR"})
 
-
+@app.route('/exchangecripto',methods=["POST"])
+@jwt_required()
+def exchange_cripto():
+    email = request.get_json(force=True).get('email')
+    symbol_from = request.get_json(force=True).get('symbolfrom')
+    symbol_to = request.get_json(force=True).get('symbolto')
+    amount=request.get_json(force=True).get('amount')
+    obj=cryptocurrencyCollection.find_one({'email':email})
+    obj = json.dumps(result, default=json)
+    if obj[symbol_from]>=amount:
+        result=exchange_cryptocurrency(symbol_from,symbol_to,amount)
+        update_symbol_from = update_cryptocurrency(email, symbol_from, amount)
+        update_symbol_to=update_cryptocurrency(email,symbol_to,result)
+        return jsonify({"result":"OK"})
+    else:
+        return jsonify({"result":"ERROR"})
+    
 @app.route('/exchangeDollarsToCrypto', methods=["POST"])
 @jwt_required()
 def exhange_dollars_to_crypto():
@@ -296,6 +312,8 @@ def new_transaction():
     global parametrs
     parametrs={"sender_email":sender_email,"receiver_email":receiver_email,"amount":amount,"cryptocurrency":cryptocurrency}
     return jsonify({"result":"OK"})
+
+
 
 @sockets.route("/verifysocket")
 def verify_notification(sockets):
