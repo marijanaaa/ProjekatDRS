@@ -52,10 +52,18 @@ const amountReducer = (state, action) => {
     return { value: '', isValid: false };
 };
 
-  
+const emailReducer = (state, action) => {
+    if (action.type === 'USER_INPUT') {
+      return { value: action.val, isValid: action.val.includes('@') };
+    }
+    if (action.type === 'INPUT_BLUR') {
+      return { value: state.value, isValid: state.value.includes('@') };
+    }
+    return { value: '', isValid: false };
+  };
 
 
-function BuyCurrenciesForm() {
+function NewTransactionForm() {
 
     const history = useHistory();
     const { isLoading, sendRequest } = useHttp(); 
@@ -68,15 +76,19 @@ function BuyCurrenciesForm() {
         value: '',
         isValid: null,
     });
-
+    const [emailState, dispatchEmail] = useReducer(emailReducer, {
+        value: '',
+        isValid: null,
+      });
    
 
     const authCtx = useContext(AuthContext);
     const amountInputRef = useRef();
-    const currencyInputRef = useRef();
-
+    const emailInputRef = useRef();
+    const currencyInputRef1 = useRef();
+   
     const { isValid: amountIsValid } = amountState;
-  
+    const { isValid: emailIsValid } = emailState;
 
     useEffect(() => {
         const identifier = setTimeout(() => {
@@ -93,11 +105,22 @@ function BuyCurrenciesForm() {
     const amountChangeHandler = (event) => {
         dispatchAmount({ type: 'USER_INPUT', val: event.target.value });
     };
+    const emailChangeHandler = (event) => {
+        // console.log(event.target.value);
+         dispatchEmail({ type: 'USER_INPUT', val: event.target.value });
+     
+         // setFormIsValid(
+         //   event.target.value.includes('@') && passwordState.isValid
+         // );
+       };
 
     const validateAmountHandler = () => {
         dispatchAmount({ type: 'INPUT_BLUR' });
       };
-
+      const validateEmailHandler = () => {
+        dispatchEmail({ type: 'INPUT_BLUR' });
+      };
+  
 
    
 
@@ -116,12 +139,14 @@ function BuyCurrenciesForm() {
         if (formIsValid) {
 
             const requestConfig = {
-                url: 'http://localhost:5000/exchangeDollarsToCrypto',
+                url: 'http://localhost:5000/newTransaction',
                 method: "POST",
                 body: JSON.stringify({
-                    email: authCtx.user.email,
-                    dollars: amountState.value,
-                    currency: currencyInputRef.current.value,
+                    sender_email: authCtx.user.email,
+                    receiver_email: emailState.value,
+                    amount: amountState.value,
+                    cryptocurrency: currencyInputRef1.current.value,
+                  
                 }
                 ),
                 headers: {
@@ -130,21 +155,21 @@ function BuyCurrenciesForm() {
 
                 },
             };
-            console.log(currencyInputRef.current.value)
+    
             const data = await sendRequest(requestConfig);
 
              console.log(data)
             if (data.result === 'ERROR') {//promeniti u skladu sa odg sa servera
                 setInfoData({
                     title: "Error",
-                    message: "Payment error",
+                    message: "Error in transaction",
                 });
 
             }
             else {
                 setInfoData({
                     title: "Success",
-                    message: "You buy criptocurrencies!",
+                    message: "Succesfuly send!",
                 });
 
             }
@@ -153,7 +178,9 @@ function BuyCurrenciesForm() {
         else if (!amountIsValid) {
             amountInputRef.current.focus();
         }
-        
+        else if (!emailIsValid) {
+            emailInputRef.current.focus();
+        }
     }
 
         return (
@@ -167,10 +194,20 @@ function BuyCurrenciesForm() {
                     />
                 )}
                 <form onSubmit={submitHandler}>
+                <Input
+                        ref={emailInputRef}
+                        id="email"
+                        label="Email:"
+                        type="email"
+                        isValid={emailIsValid}
+                        value={emailState.value}
+                        onChange={emailChangeHandler}
+                        onBlur={validateEmailHandler}
+                    />
                     <Input
                         ref={amountInputRef}
-                        id="dollars"
-                        label="Amount($):"
+                        id="from"
+                        label="Amount:"
                         type="number"
                         isValid={amountIsValid}
                         value={amountState.value}
@@ -179,15 +216,17 @@ function BuyCurrenciesForm() {
                     />
                     
                     <Select
-                    ref={currencyInputRef}
+                    ref={currencyInputRef1}
                      id="currency"
                        label="Currency:"
                       items={CURRENCY}
                         />
 
+                    
+
                     <div className={classes.actions}>
                         <Button type="submit" className={classes.btn}>
-                            Pay
+                            Send
                         </Button>
                     </div>
                 </form>
@@ -196,4 +235,4 @@ function BuyCurrenciesForm() {
     
 }
 
-export default BuyCurrenciesForm;
+export default NewTransactionForm;

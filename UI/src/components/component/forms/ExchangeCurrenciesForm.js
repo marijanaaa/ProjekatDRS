@@ -55,7 +55,7 @@ const amountReducer = (state, action) => {
   
 
 
-function PayFromCardForm() {
+function ExchangeCurrenciesForm() {
 
     const history = useHistory();
     const { isLoading, sendRequest } = useHttp(); 
@@ -204,4 +204,4 @@ function PayFromCardForm() {
     
 }
 
-export default PayFromCardForm;
+export default ExchangeCurrenciesForm;

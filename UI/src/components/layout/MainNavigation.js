@@ -60,6 +60,18 @@ function MainNavigation() {
             </li>
         )}
 
+         {ctx.isVerify && ctx.isLoggedIn && (
+            <li>
+              <Link to="/newTransaction">New Transaction</Link>
+            </li>
+        )}
+
+        {ctx.isVerify && ctx.isLoggedIn && (
+            <li>
+              <Link to="/transactionInformations"> Transactions </Link>
+            </li>
+        )}
+
           {ctx.isLoggedIn && (
             <li>
              <Button onClick={ctx.logout}>Logout</Button>

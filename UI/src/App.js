@@ -13,6 +13,8 @@ import ChangeProfilePage from "./pages/ChangeProfilePage";
 import VerificationPage from "./pages/VerificationPage"
 import ByAndExchangePage from "./pages/BuyAndExchangePage"
 import PayFromCardPage from "./pages/PayFromCardPage";
+import NewTransactionPage from "./pages/NewTransactionPage";
+import TransactionPage from "./pages/TransactionPage";
 function App() {
   const ctx = useContext(AuthContext);
   //const userIsAdmin = ctx.user !== null && ctx.user.userType === "ADMIN";
@@ -62,6 +64,17 @@ function App() {
         {ctx.isLoggedIn && ctx.isVerify && <ByAndExchangePage/>}
           {!ctx.isLoggedIn && <Redirect to="/" />}
         </Route>
+          
+        <Route path="/newTransaction">
+        {ctx.isLoggedIn && ctx.isVerify && <NewTransactionPage/>}
+          {!ctx.isLoggedIn && <Redirect to="/" />}
+        </Route>
+
+        <Route path="/transactionInformations">
+        {ctx.isLoggedIn && ctx.isVerify && <TransactionPage/>}
+          {!ctx.isLoggedIn && <Redirect to="/" />}
+        </Route>
+
       </Switch>
     </React.Fragment>
   );
