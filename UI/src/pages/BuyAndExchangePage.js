@@ -2,7 +2,7 @@ import React from "react";
 
 
 import BuyCurrenciesForm from "../components/component/forms/BuyCurrenciesForm";
-
+import ExchangeCurrenciesForm from "../components/component/forms/ExchangeCurrenciesForm";
 function BuyAndExchangePage() {
 
     return (
@@ -15,6 +15,8 @@ function BuyAndExchangePage() {
             
          </div>
          <BuyCurrenciesForm/>
+         <ExchangeCurrenciesForm/>
+         
           
     </div>
     

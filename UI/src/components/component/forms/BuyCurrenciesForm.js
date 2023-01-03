@@ -171,7 +171,7 @@ function PayFromCardForm() {
                         ref={amountInputRef}
                         id="dollars"
                         label="Amount($):"
-                        type="text"
+                        type="number"
                         isValid={amountIsValid}
                         value={amountState.value}
                         onChange={amountChangeHandler}

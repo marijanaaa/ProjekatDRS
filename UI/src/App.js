@@ -54,7 +54,7 @@ function App() {
           {!ctx.isLoggedIn && <Redirect to="/" />}
         </Route>
 
-        <Route path="/pay">
+        <Route path="/cardTransaction">
         {ctx.isLoggedIn && ctx.isVerify && <PayFromCardPage />}
           {!ctx.isLoggedIn && <Redirect to="/" />}
         </Route>

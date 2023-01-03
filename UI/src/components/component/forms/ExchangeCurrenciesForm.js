@@ -14,9 +14,30 @@ import Modal from "../modals/Modal";
 import useHttp from "../../../hook/useHttp";
 import { useHistory } from 'react-router-dom';
 import InfModal from '../modals/InfModal';
+import Select from "../input/Select";
 
-
-
+const CURRENCY= [
+    {
+      id: 1,
+      name: "BTC",
+    },
+    {
+      id: 2,
+      name: "ETH",
+    },
+    {
+        id: 3,
+        name: "USDT",
+      },
+      {
+        id: 4,
+        name: "BUSD",
+      },
+      {
+        id: 5,
+        name: "DOGE",
+      },
+  ];
 
 
   
@@ -52,8 +73,8 @@ function PayFromCardForm() {
 
     const authCtx = useContext(AuthContext);
     const amountInputRef = useRef();
-    //const currencyInputRef = useRef();
-
+    const currencyInputRef1 = useRef();
+    const currencyInputRef2 = useRef();
     const { isValid: amountIsValid } = amountState;
   
 
@@ -95,12 +116,14 @@ function PayFromCardForm() {
         if (formIsValid) {
 
             const requestConfig = {
-                url: 'http://localhost:5000/cardTransaction',
+                url: 'http://localhost:5000/exchangecripto',
                 method: "POST",
                 body: JSON.stringify({
                     email: authCtx.user.email,
-                    dollars: amountState.value,
-                   // currency: currencyInputRef.current.value,
+                    amount: amountState.value,
+                    symbolfrom: currencyInputRef1.current.value,
+                    symbolto: currencyInputRef2.current.value,
+
                 }
                 ),
                 headers: {
@@ -109,8 +132,10 @@ function PayFromCardForm() {
 
                 },
             };
+            console.log(currencyInputRef1.current.value)
             const data = await sendRequest(requestConfig);
 
+             console.log(data)
             if (data.result === 'ERROR') {//promeniti u skladu sa odg sa servera
                 setInfoData({
                     title: "Error",
@@ -121,7 +146,7 @@ function PayFromCardForm() {
             else {
                 setInfoData({
                     title: "Success",
-                    message: "Money successfully paid into the account!",
+                    message: "You buy criptocurrencies!",
                 });
 
             }
@@ -146,8 +171,8 @@ function PayFromCardForm() {
                 <form onSubmit={submitHandler}>
                     <Input
                         ref={amountInputRef}
-                        id="dollars"
-                        label="Amount($):"
+                        id="from"
+                        label="From:"
                         type="number"
                         isValid={amountIsValid}
                         value={amountState.value}
@@ -155,11 +180,22 @@ function PayFromCardForm() {
                         onBlur={validateAmountHandler}
                     />
                     
-                  
+                    <Select
+                    ref={currencyInputRef1}
+                     id="currency"
+                      items={CURRENCY}
+                        />
+
+                    <Select
+                    ref={currencyInputRef2}
+                     id="currency"
+                       label="To:"
+                      items={CURRENCY}
+                        />
 
                     <div className={classes.actions}>
                         <Button type="submit" className={classes.btn}>
-                            Pay
+                            Exchange
                         </Button>
                     </div>
                 </form>
