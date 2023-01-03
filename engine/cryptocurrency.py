@@ -19,6 +19,6 @@ def get_coins_from_dollars(dollars,symbol):
 def exchange_cryptocurrency(symbol_from,symbol_to,amount):
     price_symbol_from=get_price(get_assets_coin_cap_API(),symbol_from)
     price_symbol_to=get_price(get_assets_coin_cap_API(),symbol_to)
-    return amount*price_symbol_from/price_symbol_to
+    return float(amount)*float(price_symbol_from)/float(price_symbol_to)
 
 

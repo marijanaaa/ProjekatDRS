@@ -174,14 +174,31 @@ def exchange_cripto():
     symbol_to = request.get_json(force=True).get('symbolto')
     amount=request.get_json(force=True).get('amount')
     obj=cryptocurrencyCollection.find_one({'email':email})
-    obj = json.dumps(result, default=json)
-    if obj[symbol_from]>=amount:
-        result=exchange_cryptocurrency(symbol_from,symbol_to,amount)
-        update_symbol_from = update_cryptocurrency(email, symbol_from, amount)
-        update_symbol_to=update_cryptocurrency(email,symbol_to,result)
+    obj = json.dumps(obj, default=str)
+    obj = json.loads(obj)
+    if float(obj[symbol_from])> float(amount):
+        result=exchange_cryptocurrency(symbol_from,symbol_to,float(amount))
+        update_symbol_from = update_cryptocurrency(email, symbol_from, decrease_crypto(email,symbol_from,float(amount)))
+        update_symbol_to=update_cryptocurrency(email,symbol_to,increase_crypto(email,symbol_to,result))
         return jsonify({"result":"OK"})
     else:
-        return jsonify({"result":"ERROR"})
+        return jsonify({"result":"You don't have enough cryptocurrency for this exchange"})
+
+def increase_crypto(email,symbol,amount):
+    result = cryptocurrencyCollection.find_one({"email":email})
+    result = json.dumps(result, default=str)
+    result_dict = json.loads(result)
+    old_amount = float(result_dict[symbol])
+    new_amount = old_amount + float(amount)
+    return new_amount
+
+def decrease_crypto(email, symbol,amount):
+    result = cryptocurrencyCollection.find_one({"email":email})
+    result = json.dumps(result, default=str)
+    result_dict = json.loads(result)
+    old_amount = float(result_dict[symbol])
+    new_amount = old_amount - float(amount)
+    return new_amount
     
 @app.route('/exchangeDollarsToCrypto', methods=["POST"])
 @jwt_required()
