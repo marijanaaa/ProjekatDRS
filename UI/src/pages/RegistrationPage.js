@@ -8,6 +8,7 @@ function RegistrationPage() {
                 
              </div>
               <RegistrationForm />
+             
         </div>
         
       );

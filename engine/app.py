@@ -6,6 +6,7 @@ from datetime import datetime
 from hash import create_hash
 from enums import transaction_state
 from flask_cors import CORS
+import datetime
 import jwt
 from werkzeug.security import generate_password_hash,check_password_hash
 from functools import wraps
@@ -313,11 +314,11 @@ def sort_transactions():
         result=sort_transaction_date_down(json.loads(collection))
     return json.dumps(result,default=json)
 
-@app.route('/filterTransactions', methods=["GET"])
+@app.route('/filterTransactions', methods=["POST"])
 def filter_transactions():
     email = request.get_json(force=True).get('email')
     #transaction_state = request.get_json(force=True).get('transactionState')
-    factor=request.get_json(force=True).get('facotr')
+    factor=request.get_json(force=True).get('factor')
     collection = transactionCollection.find({"sender": email}, {"receiver":email})
     collection=json.dumps(collection)
     if factor == "datetime":

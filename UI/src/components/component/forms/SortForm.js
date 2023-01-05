@@ -16,7 +16,28 @@ import { useHistory } from 'react-router-dom';
 import InfModal from '../modals/InfModal';
 import Select from "../input/Select";
 
-
+const SORTBY= [
+    {
+      id: 1,
+      name: "Amount",
+    },
+    {
+      id: 2,
+      name: "Date",
+    },
+   
+  ];
+  const SORT= [
+    {
+      id: 1,
+      name: "Ascending",
+    },
+    {
+      id: 2,
+      name: "Descending",
+    },
+   
+  ];
 
 
   
@@ -26,19 +47,18 @@ import Select from "../input/Select";
 
 
 
-function TransactionForm() {
+function SortForm() {
 
     const history = useHistory();
     const { isLoading, sendRequest } = useHttp(); 
    
     const [infoData, setInfoData] = useState(null);
 
-    let sortBy  = ['Amount', 'Date'];
-    let sort  = ['Ascending', 'Descending'];
+    const sortInputRef = useRef();
+    const sortByInputRef = useRef();
 
 
-    const [factor, setFactor] = useState(null)
-    const [value, setValue] = useState(null)
+   
 
     const authCtx = useContext(AuthContext);
    
@@ -62,12 +82,12 @@ function TransactionForm() {
        
 
             const requestConfig = {
-                url: 'http://localhost:5000/newTransaction',
+                url: 'http://localhost:5000/sortTransactions',
                 method: "POST",
                 body: JSON.stringify({
                     email: authCtx.user.email,
-                    factor: factor, 
-                  value: value, 
+                    factor: sortByInputRef.current.value, 
+                  value: sortInputRef.current.value, 
                    
                   
                 }
@@ -114,17 +134,18 @@ function TransactionForm() {
                 <form onSubmit={submitHandler}>
                 
                    
-                    
-                <combobox
-                data={sortBy}
-                value={factor}
-               onChange={factor => setFactor(factor)}
-                 />
-                 <combobox
-                data={sort}
-                value={value}
-               onChange={value => setValue(value)}
-                 />
+                <Select
+                    ref={sortByInputRef}
+                     id="sortBy"
+                       label="Sort by:"
+                      items={SORTBY}
+                        />
+                <Select
+                    ref={sortInputRef}
+                     id="sort"
+                       label="Sorting method:"
+                      items={SORT}
+                        />
                     
 
                     <div className={classes.actions}>
@@ -138,4 +159,4 @@ function TransactionForm() {
     
 }
 
-export default TransactionForm;
+export default SortForm;

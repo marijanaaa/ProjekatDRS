@@ -11,7 +11,10 @@ const AuthContext = React.createContext({
   verify: () => {},
   update: (data) => {},
   user: {},
+  transaction: {}, 
+  getTransaction: () => {},
 });
+
 
 
 
@@ -27,10 +30,16 @@ const retrieveStoredToken = () => {
 
 const initialUser = localStorage.getItem("user");
 
+const initialTransaction = localStorage.getItem("transaction");
+
 
 export const AuthContextProvider = (props) => {
   const [user, setUser] = useState(
     initialUser !== null && JSON.parse(initialUser)
+  );
+
+  const [transaction, setTransaction] = useState(
+    initialTransaction !== null && JSON.parse(initialTransaction)
   );
   const tokenData = retrieveStoredToken();
   
@@ -43,6 +52,40 @@ export const AuthContextProvider = (props) => {
 
   const userIsLoggedIn = !!token;
   const [userIsVerify, setUserVer] = useState(false);
+
+
+
+  const transactions = (data) => {
+    // console.log(token); taj token je prenesen iz LoginForme i ovde se cuva(za sad pisem name dok marijana ne generise token)
+    
+    
+     const newTransaction = {
+       _id: data._id,
+       sender: data.sender,
+       receiver: data.receiver,
+       criptocurrency: data.criptocurrency,
+       amount: data.amount,
+ 
+       date: data.date,
+       
+          
+     };
+     setTransaction(newTransaction);
+     
+     console.log()
+     localStorage.setItem("transaction", JSON.stringify(newTransaction));
+     
+      
+     
+ 
+     
+   };
+ 
+
+
+
+
+
 
   const updateHandler = (data) => {
     console.log(data.password)
@@ -132,6 +175,8 @@ export const AuthContextProvider = (props) => {
     update: updateHandler,
     verify : verifyHandler,
     user: user,
+    transaction:transaction,
+    getTransaction : transactions,
   };
 
   return (
