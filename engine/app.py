@@ -298,18 +298,15 @@ def get_transactions():
     email = request.get_json(force=True).get('email')
     collection_sender = transactionCollection.find({"sender": email})
     collection_receiver = transactionCollection.find({"receiver": email})
-    merged_dict_sender = {}
-    merged_dict_receiver = {}
+    list = []
     for sender in collection_sender:
         json_sender = json.dumps(sender, default=str) 
-        dict_sender = json.loads(json_sender)
-        Merge(dict_sender,merged_dict_sender)
+        list.append(json_sender)
     for sender in collection_receiver:
         json_receiver = json.dumps(sender, default=str) 
-        dict_receiver = json.loads(json_receiver)
-        Merge(dict_receiver,merged_dict_receiver)
-    Merge(merged_dict_receiver, merged_dict_sender)
-    return json.dumps(merged_dict_sender, default=json)
+        list.append(json_receiver)
+    json_obj = '{"transactions":"%s"}' % list
+    return jsonify({"result":json_obj})
 
 
 @app.route('/sortTransactions', methods=["POST"])
