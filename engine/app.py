@@ -305,7 +305,7 @@ def get_transactions():
     dictionary={}
     for i in range(0,len(array_of_transaction)) :
         dictionary.update({str(i):str(array_of_transaction[i])})
-    return {'result': json.dumps(dictionary)}
+    return json.dumps(dictionary, default=json)
 
 @app.route('/sortTransactions', methods=["POST"])
 @jwt_required()
@@ -336,7 +336,7 @@ def sort_transactions():
     dictionary={}
     for i in range(0,len(result)) :
         dictionary.update({str(i):str(result[i])})
-    return {'result': json.dumps(dictionary)}
+    return json.dumps(dictionary, default=json)
 
 @app.route('/filterTransactions', methods=["POST"])
 def filter_transactions():
@@ -356,24 +356,17 @@ def filter_transactions():
                                'cryptocurrency':c["cryptocurrency"],'amount':c["amount"],'state': c['state'],'date':c['date']})
     if date != None:
         result=filtering_datetime(date,array_of_transaction)
-        dictionary={}
-        for i in range(0,len(result)) :
-            dictionary.update({str(i):str(result[i])})
         return {'result': json.dumps(dictionary)}
     elif recvEmail!=None:
         result=filtering_by_email(recvEmail,array_of_transaction)
-        dictionary={}
-        for i in range(0,len(result)) :
-            dictionary.update({str(i):str(result[i])})
-        return {'result': json.dumps(dictionary)}
     else :
         min=float(min)
         max=float(max)
         result=filtering_amount(min,max,array_of_transaction)
-        dictionary={}
-        for i in range(0,len(result)) :
-            dictionary.update({str(i):str(result[i])})
-        return {'result': json.dumps(dictionary)}
+    dictionary={}
+    for i in range(0,len(result)) :
+        dictionary.update({str(i):str(result[i])})
+    return json.dumps(dictionary, default=json)
 
 
 @app.route('/newTransaction',methods=["POST"])
