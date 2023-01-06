@@ -289,14 +289,28 @@ def insert_cryptocurrency(email, currency, coin_amount):
     return result
 
 
+def Merge(dict1, dict2):
+    return(dict2.update(dict1))
+
 @app.route('/getTransactions', methods=["POST"])
 @jwt_required()
 def get_transactions():
     email = request.get_json(force=True).get('email')
     collection_sender = transactionCollection.find({"sender": email})
     collection_receiver = transactionCollection.find({"receiver": email})
-    return_list = list(collection_sender) + list(collection_receiver)
-    return json.dumps(return_list, default=json)
+    merged_dict_sender = {}
+    merged_dict_receiver = {}
+    for sender in collection_sender:
+        json_sender = json.dumps(sender, default=str) 
+        dict_sender = json.loads(json_sender)
+        Merge(dict_sender,merged_dict_sender)
+    for sender in collection_receiver:
+        json_receiver = json.dumps(sender, default=str) 
+        dict_receiver = json.loads(json_receiver)
+        Merge(dict_receiver,merged_dict_receiver)
+    Merge(merged_dict_receiver, merged_dict_sender)
+    return json.dumps(merged_dict_sender, default=json)
+
 
 @app.route('/sortTransactions', methods=["POST"])
 @jwt_required()
