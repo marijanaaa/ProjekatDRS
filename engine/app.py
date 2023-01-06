@@ -296,7 +296,7 @@ def get_transactions():
     collection_sender = transactionCollection.find({"sender": email})
     collection_receiver = transactionCollection.find({"receiver": email})
     return_list = list(collection_sender) + list(collection_receiver)
-    return json.dumps(return_list)
+    return json.dumps(return_list, default=json)
 
 @app.route('/sortTransactions', methods=["POST"])
 @jwt_required()
