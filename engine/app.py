@@ -293,19 +293,10 @@ def insert_cryptocurrency(email, currency, coin_amount):
 @jwt_required()
 def get_transactions():
     email = request.get_json(force=True).get('email')
-    collection = transactionCollection.find({"sender": email})
-    collection2 = transactionCollection.find({"receiver": email})
-    array_of_transaction=[]
-    for c in collection:
-        array_of_transaction.append({'hash':c['hash'],'sender':c["sender"],'receiver':c["receiver"],
-                               'cryptocurrency':c["cryptocurrency"],'amount':c["amount"],'state': c['state'],'date':c['date']}) 
-    for c in collection2:
-        array_of_transaction.append({'hash':c['hash'],'sender':c["sender"],'receiver':c["receiver"],
-                               'cryptocurrency':c["cryptocurrency"],'amount':c["amount"],'state': c['state'],'date':c['date']}) 
-    dictionary={}
-    for i in range(0,len(array_of_transaction)) :
-        dictionary.update({str(i):str(array_of_transaction[i])})
-    return json.dumps(dictionary, default=json)
+    collection_sender = transactionCollection.find({"sender": email})
+    collection_receiver = transactionCollection.find({"receiver": email})
+    return_list = list(collection_sender) + list(collection_receiver)
+    return json.dumps(return_list)
 
 @app.route('/sortTransactions', methods=["POST"])
 @jwt_required()
@@ -333,7 +324,7 @@ def sort_transactions():
         result=sort_transaction_date_up(array_of_transaction)
     else:
         result=sort_transaction_date_down(array_of_transaction)    
-    dictionary={}
+    dictionary=[]
     for i in range(0,len(result)) :
         dictionary.update({str(i):str(result[i])})
     return json.dumps(dictionary, default=json)
