@@ -191,7 +191,10 @@ def increase_crypto(email,symbol,amount):
     result = json.dumps(result, default=str)
     result_dict = json.loads(result)
     old_amount = float(result_dict[symbol])
+    print(amount)
+    print(result_dict[symbol])
     new_amount = old_amount + float(amount)
+    print(new_amount)
     return new_amount
 
 def decrease_crypto(email, symbol,amount):
@@ -228,7 +231,7 @@ def exhange_dollars_to_crypto():
     result_dict = json.loads(res)
     if float(result_dict["dollars"]) < float(amount_in_dollars):
         return jsonify({'result':'ERROR'})
-    result = update_cryptocurrency(email, currency, coin_amount)
+    result = update_cryptocurrency(email, currency,increase_crypto(email,currency,coin_amount))
     res = decrease_dollar_amount(email, amount_in_dollars)
     if result.matched_count > 0 and res == "OK":
         return jsonify({"result":"OK"})
@@ -265,11 +268,8 @@ def decrease_dollar_amount(email, amount_in_dollars):
 def update_cryptocurrency(email, currency, coin_amount):
     result = cryptocurrencyCollection.find_one({"email":email})
     result = json.dumps(result, default=str)
-    result_dict = json.loads(result)
-    old_coin_amount = float(result_dict[currency])
-    new_coin_amount = float(coin_amount) + old_coin_amount
     query={'email':email}
-    new_value = {"$set":{currency:new_coin_amount}}
+    new_value = {"$set":{currency:coin_amount}}
     result = cryptocurrencyCollection.update_one(query,new_value)
     return result
 
@@ -347,15 +347,13 @@ def new_transaction():
 
 @sockets.route("/verifysocket")
 def verify_notification(sockets):
-    if parametrs!= None:
-        t1 = threading.Thread(target=transaction_class.transaction_processing, args=(parametrs,))
-        t1.start()
-        t1.join()
-        result= t1.value
-        if result==True:
-            sockets.send(jsonify({"result":"OK"}))
-        else:
-            sockets.send(jsonify({"result":"ERROR"}))
+    global parametrs
+    while parametrs!=None: 
+        print(parametrs)
+        pom=parametrs
+        parametrs=None
+        result = transaction_class.transaction_processing(pom)       
+        sockets.send(result)
 
 
 if __name__=='__main__':

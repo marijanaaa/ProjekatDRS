@@ -164,6 +164,11 @@ export const AuthContextProvider = (props) => {
       console.log(tokenData.duration);
      
     }
+    let verifySocket = new WebSocket("ws://localhost:5000/verifysocket");
+    console.log("soket");
+    verifySocket.onmessage=function(ev){
+      alert(ev.data)
+    }
   }, [tokenData, logoutHandler]);
 
   const contextValue = {
