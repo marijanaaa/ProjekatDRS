@@ -13,3 +13,10 @@ def filtering_datetime(date,transactions):
         if t['date'].date()==date:
             filtered_transaction.append(t)
     return filtered_transaction
+
+def filtering_by_email(email,transactions):
+    filtered_transaction=[]
+    for t in transactions:
+        if email in t['sender'] or email in t['receiver']:
+            filtered_transaction.append(t)
+    return filtered_transaction
