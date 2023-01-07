@@ -310,8 +310,6 @@ def get_transactions():
     json_string = json.dumps(json_docs, default=json_util.default)
     return jsonify({"result":json_string})
     
-   
-
 
 @app.route('/sortTransactions', methods=["POST"])
 @jwt_required()

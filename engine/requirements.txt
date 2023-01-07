@@ -8,3 +8,4 @@ pyjwt
 datetime
 flask-jwt-extended
 flask_sock
+pytz
