@@ -18,6 +18,8 @@ import threading
 from flask_sock import Sock
 from function_for_sorting import sort_transactions_up, sort_transactions_down,sort_transaction_date_up,sort_transaction_date_down
 from function_for_filtering import filtering_amount,filtering_datetime,filtering_by_email
+from bson import json_util
+from itertools import chain
 
 #collections
 userCollection = db["users"]
@@ -296,17 +298,16 @@ def Merge(dict1, dict2):
 @jwt_required()
 def get_transactions():
     email = request.get_json(force=True).get('email')
-    collection_sender = transactionCollection.find({"sender": email})
-    collection_receiver = transactionCollection.find({"receiver": email})
-    list = []
-    for sender in collection_sender:
-        json_sender = json.dumps(sender, default=str) 
-        list.append(json_sender)
-    for sender in collection_receiver:
-        json_receiver = json.dumps(sender, default=str) 
-        list.append(json_receiver)
-    json_obj = '{"transactions":"%s"}' % list
-    return jsonify({"result":json_obj})
+    sender_cursor = transactionCollection.find({"sender": email})
+    receiver_cursor = transactionCollection.find({"receiver": email})
+    union_cursor = chain(sender_cursor,receiver_cursor)
+    json_docs = []
+    for doc in union_cursor:
+        json_doc = json.loads(json_util.dumps(doc)) 
+        json_docs.append(json_doc)
+    print(json_docs)
+    return jsonify({"result":json_docs})
+   
 
 
 @app.route('/sortTransactions', methods=["POST"])
@@ -386,6 +387,7 @@ def new_transaction():
 @sockets.route("/verifysocket")
 def verify_notification(sockets):
     global parametrs
+    print(parametrs)
     while parametrs!=None: 
         print(parametrs)
         pom=parametrs
