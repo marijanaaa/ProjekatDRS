@@ -300,13 +300,16 @@ def get_transactions():
     email = request.get_json(force=True).get('email')
     sender_cursor = transactionCollection.find({"sender": email})
     receiver_cursor = transactionCollection.find({"receiver": email})
-    union_cursor = chain(sender_cursor,receiver_cursor)
+    union_cursor = chain(sender_cursor, receiver_cursor)
     json_docs = []
     for doc in union_cursor:
-        json_doc = json.loads(json_util.dumps(doc)) 
+        json_doc = json.loads(json_util.dumps(doc))
+        del json_doc['_id']
+        del json_doc['hash']
         json_docs.append(json_doc)
-    print(json_docs)
-    return jsonify({"result":json_docs})
+    json_string = json.dumps(json_docs, default=json_util.default)
+    return jsonify({"result":json_string})
+    
    
 
 
