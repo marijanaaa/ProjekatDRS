@@ -307,8 +307,8 @@ def get_transactions():
         del json_doc['_id']
         del json_doc['hash']
         json_docs.append(json_doc)
-    json_string = json.dumps(json_docs, default=json_util.default)
-    return jsonify({"result":json_string})
+    return json.dumps(json_docs, default=json_util.default)
+    #return jsonify({"result":json_string})
     
 
 @app.route('/sortTransactions', methods=["POST"])

@@ -16,7 +16,7 @@ function Backdrop(props) {
       </Card>
     );
   }
-  
+ // <Backdrop  onClick={clickHandler}/>
   const Modal = (props) => {
     const history = useHistory();
     function clickHandler() {
@@ -24,7 +24,7 @@ function Backdrop(props) {
     }
     return (
       <div>
-      <Backdrop  onClick={clickHandler}/>
+     
       <ModalOverlay/>
  
       </div>

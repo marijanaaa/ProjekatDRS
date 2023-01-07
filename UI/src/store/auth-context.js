@@ -6,13 +6,17 @@ const AuthContext = React.createContext({
   token: '',
   isLoggedIn: false,
   isVerify: false,
+  setTr : () => {},
   login: (data) => {},
   logout: () => {},
   verify: () => {},
   update: (data) => {},
   user: {},
+  isTransaction : false,
   transaction: {}, 
   getTransaction: () => {},
+ 
+
 });
 
 
@@ -38,6 +42,8 @@ export const AuthContextProvider = (props) => {
     initialUser !== null && JSON.parse(initialUser)
   );
 
+ 
+ 
   const [transaction, setTransaction] = useState(
     initialTransaction !== null && JSON.parse(initialTransaction)
   );
@@ -49,7 +55,7 @@ export const AuthContextProvider = (props) => {
   }
 
   const [token, setToken] = useState(initialToken);
-
+ const [istrans, setIsTran] = useState(false);
   const userIsLoggedIn = !!token;
   const [userIsVerify, setUserVer] = useState(false);
 
@@ -59,21 +65,15 @@ export const AuthContextProvider = (props) => {
     // console.log(token); taj token je prenesen iz LoginForme i ovde se cuva(za sad pisem name dok marijana ne generise token)
     
     
-     const newTransaction = {
-       _id: data._id,
-       sender: data.sender,
-       receiver: data.receiver,
-       criptocurrency: data.criptocurrency,
-       amount: data.amount,
- 
-       date: data.date,
-       
-          
-     };
-     setTransaction(newTransaction);
+    
+     setTransaction(data);
      
-     console.log()
-     localStorage.setItem("transaction", JSON.stringify(newTransaction));
+     
+
+ 
+    
+    
+     localStorage.setItem("transaction", JSON.stringify(data));
      
       
      
@@ -84,7 +84,10 @@ export const AuthContextProvider = (props) => {
 
 
 
-
+const setingTr =() =>{
+      setIsTran(true);  
+      console.log(istrans)
+}
 
 
   const updateHandler = (data) => {
@@ -164,11 +167,18 @@ export const AuthContextProvider = (props) => {
       console.log(tokenData.duration);
      
     }
-    let verifySocket = new WebSocket("ws://localhost:5000/verifysocket");
-    console.log("soket");
-    verifySocket.onmessage=function(ev){
-      alert(ev.data)
-    }
+   
+    //  authCtx.setTr()
+   // let verifySocket = new WebSocket("ws://localhost:5000/verifysocket");
+   // console.log("soket");
+     // verifySocket.onmessage=function(ev){
+// console.log(authCtx.isTransaction)
+        ///console.log(ev.data)
+       // setIsTran(true)
+   //}
+     
+     
+   
   }, [tokenData, logoutHandler]);
 
   const contextValue = {
@@ -182,6 +192,13 @@ export const AuthContextProvider = (props) => {
     user: user,
     transaction:transaction,
     getTransaction : transactions,
+    isTransaction : istrans,
+    setTr : setingTr,
+   
+
+    
+    
+
   };
 
   return (

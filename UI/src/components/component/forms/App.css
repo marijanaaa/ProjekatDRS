@@ -1,0 +1,24 @@
+.App {
+    width: auto;
+    height: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+    
+  table {
+    border: 2px solid blanchedalmond;
+    width: auto;
+    height: auto;
+  }
+    
+  th {
+    border-bottom: 1px solid blanchedalmond;
+
+  }
+    
+  td {
+    text-align: center;
+    color: blanchedalmond;
+    text-decoration-color: red;
+  }

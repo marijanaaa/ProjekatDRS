@@ -67,7 +67,8 @@ function NewTransactionForm() {
 
     const history = useHistory();
     const { isLoading, sendRequest } = useHttp(); 
-   
+    const [isLoad, setIsLoad] = useState(false);
+    const [IsL, setL] = useState(false)
     const [infoData, setInfoData] = useState(null);
 
     const [formIsValid, setFormIsValid] = useState(false);
@@ -93,14 +94,41 @@ function NewTransactionForm() {
     useEffect(() => {
         const identifier = setTimeout(() => {
             console.log('Checking form validity!');
-            setFormIsValid(amountIsValid);
+            setFormIsValid(amountIsValid, emailIsValid, IsL);
+
         }, 500);
+
+
+        let verifySocket = new WebSocket("ws://localhost:5000/verifysocket");
+        console.log("soket");
+        console.log("usao sam iznad socket fje")
+       
+
+
+        verifySocket.addEventListener('message', (event) => {
+            console.log("cekam odg")
+            console.log(event.data);
+           // alert(event.data)
+            if(event.data === "True"){
+                console.log("promenio sam se")
+                console.log(IsL)
+                setL(true)
+            }
+        });
+          //verifySocket.onmessage=function(ev){
+            //console.log("Usao sam u fju ")
+            //setIsLoad(true)
+              
+           // console.log(ev.data)
+           //alert(ev.data)
+      // }
+       console.log("izasao sam iz fje")
 
         return () => {
             console.log('CLEANUP');
             clearTimeout(identifier);
         };
-    }, [amountIsValid]);
+    }, [amountIsValid, emailIsValid, IsL]);
 
     const amountChangeHandler = (event) => {
         dispatchAmount({ type: 'USER_INPUT', val: event.target.value });
@@ -167,9 +195,28 @@ function NewTransactionForm() {
 
             }
             else {
+                
+                if(IsL){
+                    setIsLoad(false) //vise ne treba da se vrti
+                }
+                else{
+                    setIsLoad(true)
+                }
+            
+            
+        }
+           // verifySocket.onmessage=function(ev){
+            
+             //console.log(ev.data)
+            
+             
+            
+
+           
+            if(authCtx.isTransaction){
                 setInfoData({
                     title: "Success",
-                    message: "Succesfuly send!",
+                    message: "Transaction get",
                 });
 
             }
@@ -185,8 +232,9 @@ function NewTransactionForm() {
 
         return (
             <Card className={classes.login}>
+                {isLoad && <Modal/>}
                 {isLoading && <Modal />}
-                {infoData && (
+                {infoData &&  (
                     <InfModal
                         title={infoData.title}
                         message={infoData.message}
