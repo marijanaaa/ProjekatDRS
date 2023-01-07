@@ -317,30 +317,25 @@ def sort_transactions():
     factor = request.get_json(force=True).get('factor')
     value = request.get_json(force=True).get('value')
     email = request.get_json(force=True).get('email')
-    print(factor)
-    print(value)
-    print(email)
-    collection = transactionCollection.find({"sender": email})
-    collection2 = transactionCollection.find({"receiver": email})
-    array_of_transaction=[]
-    for c in collection:
-        array_of_transaction.append({'hash':c['hash'],'sender':c["sender"],'receiver':c["receiver"],
-                               'cryptocurrency':c["cryptocurrency"],'amount':c["amount"],'state': c['state'],'date':c['date']}) 
-    for c in collection2:
-        array_of_transaction.append({'hash':c['hash'],'sender':c["sender"],'receiver':c["receiver"],
-                               'cryptocurrency':c["cryptocurrency"],'amount':c["amount"],'state': c['state'],'date':c['date']})     
+    sender_cursor = transactionCollection.find({"sender": email})
+    receiver_cursor = transactionCollection.find({"receiver": email})
+    union_cursor = chain(sender_cursor, receiver_cursor)  
+    json_docs = []
+    for doc in union_cursor:
+        json_doc = json.loads(json_util.dumps(doc))
+        del json_doc['_id']
+        del json_doc['hash']
+        json_docs.append(json_doc)
+        print(json_doc)
     if value=="Ascending" and factor=="Amount":
-        result=sort_transactions_up(array_of_transaction)
+        result=sort_transactions_up(json_docs)
     elif value=="Descending" and factor=="Amount":
-        result=sort_transactions_down(array_of_transaction)
+        result=sort_transactions_down(json_docs)
     elif value=="Ascending" and factor=="Date":
-        result=sort_transaction_date_up(array_of_transaction)
+        result=sort_transaction_date_up(json_docs)
     else:
-        result=sort_transaction_date_down(array_of_transaction)    
-    dictionary=[]
-    for i in range(0,len(result)) :
-        dictionary.update({str(i):str(result[i])})
-    return json.dumps(dictionary, default=json)
+        result=sort_transaction_date_down(json_docs)   
+    return json.dumps(result, default=json_util.default)
 
 @app.route('/filterTransactions', methods=["POST"])
 def filter_transactions():
@@ -349,28 +344,24 @@ def filter_transactions():
     recvEmail = request.get_json(force=True).get('recvEmail')
     min=request.get_json(force=True).get('min')
     max=request.get_json(force=True).get('max')
-    collection = transactionCollection.find({"sender": email})
-    collection2 = transactionCollection.find({"receiver": email})
-    array_of_transaction=[]
-    for c in collection:
-        array_of_transaction.append({'hash':c['hash'],'sender':c["sender"],'receiver':c["receiver"],
-                               'cryptocurrency':c["cryptocurrency"],'amount':c["amount"],'state': c['state'],'date':c['date']}) 
-    for c in collection2:
-        array_of_transaction.append({'hash':c['hash'],'sender':c["sender"],'receiver':c["receiver"],
-                               'cryptocurrency':c["cryptocurrency"],'amount':c["amount"],'state': c['state'],'date':c['date']})
+    sender_cursor = transactionCollection.find({"sender": email})
+    receiver_cursor = transactionCollection.find({"receiver": email})
+    union_cursor = chain(sender_cursor, receiver_cursor)
+    json_docs = []
+    for doc in union_cursor:
+        json_doc = json.loads(json_util.dumps(doc))
+        del json_doc['_id']
+        del json_doc['hash']
+        json_docs.append(json_doc)
     if date != None:
-        result=filtering_datetime(date,array_of_transaction)
-        return {'result': json.dumps(dictionary)}
+        result=filtering_datetime(date,json_docs)
     elif recvEmail!=None:
-        result=filtering_by_email(recvEmail,array_of_transaction)
+        result=filtering_by_email(recvEmail,json_docs)
     else :
         min=float(min)
         max=float(max)
-        result=filtering_amount(min,max,array_of_transaction)
-    dictionary={}
-    for i in range(0,len(result)) :
-        dictionary.update({str(i):str(result[i])})
-    return json.dumps(dictionary, default=json)
+        result=filtering_amount(min,max,json_docs)
+    return json.dumps(result, default=json_util.default)
 
 
 @app.route('/newTransaction',methods=["POST"])

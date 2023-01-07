@@ -8,9 +8,11 @@ def filtering_amount(min,max,transactions):
     return filtered_transaction
 
 def filtering_datetime(date,transactions):
+    date_transformed=datetime.strptime(date+" 00:00:00",'%Y-%m-%d %H:%M:%S').date()
     filtered_transaction=[]
     for t in transactions:
-        if t['date'].date()==date:
+        date_transaction=datetime.strptime(t['date'],'%m/%d/%Y %H:%M:%S').date()
+        if  date_transaction==date_transformed:
             filtered_transaction.append(t)
     return filtered_transaction
 
