@@ -9,18 +9,18 @@ def transaction_processing(parametrs):
     if user == None:
         hash=""
         transactionCollection.insert_one({'hash':hash,'sender':parametrs["sender_email"],'receiver':parametrs["receiver_email"],
-                               'cryptocurrency':parametrs["cryptocurrency"],'amount':parametrs["amount"],'state': str(transaction_state.DENIED),
+                               'cryptocurrency':parametrs["cryptocurrency"],'amount':parametrs["amount"],'state': 'DENIED',
                                'date':datetime.now(tz=pytz.UTC).strftime("%m/%d/%Y, %H:%M:%S")})
         return False
 
     hash = create_hash(parametrs["sender_email"], parametrs["receiver_email"], str(parametrs["amount"]))
     transactionCollection.insert_one({'hash':hash,'sender':parametrs["sender_email"],'receiver':parametrs["receiver_email"],
-                               'cryptocurrency':parametrs["cryptocurrency"],'amount':parametrs["amount"],'state': str(transaction_state.PROCESSING),
+                               'cryptocurrency':parametrs["cryptocurrency"],'amount':parametrs["amount"],'state': 'PROCESSING',
                                'date':datetime.now(tz=pytz.UTC).strftime("%m/%d/%Y, %H:%M:%S")})
     
     hash = create_hash(parametrs["sender_email"], parametrs["receiver_email"], str(parametrs["amount"]))
     transactionCollection.insert_one({'hash':hash,'sender':parametrs["sender_email"],'receiver':parametrs["receiver_email"],
-                               'cryptocurrency':parametrs["cryptocurrency"],'amount':parametrs["amount"],'state': str(transaction_state.PROCESSED),
+                               'cryptocurrency':parametrs["cryptocurrency"],'amount':parametrs["amount"],'state': 'PROCESSED',
                                'date':datetime.now(tz=pytz.UTC).strftime("%m/%d/%Y, %H:%M:%S")})
     
     res=update_cryptocurrency(parametrs["sender_email"],parametrs["cryptocurrency"],decrease_crypto(parametrs["sender_email"],parametrs["cryptocurrency"],parametrs["amount"]))
