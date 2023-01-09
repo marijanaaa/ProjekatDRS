@@ -9,7 +9,7 @@ from flask import json
 from database_functions import *
 
 def transaction_processing(parametrs,q):  
-    time.sleep(10)
+    time.sleep(20)
     client = MongoClient(host='test_mongodb',
                          port=27017, 
                          username='root', 

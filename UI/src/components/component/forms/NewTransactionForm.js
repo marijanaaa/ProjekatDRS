@@ -68,6 +68,7 @@ function NewTransactionForm() {
     const history = useHistory();
     const { isLoading, sendRequest } = useHttp(); 
     const [isLoad, setIsLoad] = useState(false);
+   
     const [IsL, setL] = useState(false)
     const [infoData, setInfoData] = useState(null);
 
@@ -186,23 +187,20 @@ function NewTransactionForm() {
         
         let verifySocket = new WebSocket("ws://localhost:5000/verifysocket");
        
-
+       
 
         verifySocket.addEventListener('message', (event) => {
             console.log("cekam odg")
-            
-  
+          
+           
            // alert(event.data)
             if(event.data === "True"){
+                authCtx.addData(true)
                
                
-                setInfoData({
-                    title: "Succes",
-                    message: "The transaction was completed successfully",
-                });
                
-                authCtx.loading(false)
-             verifySocket.close()
+               
+           
                 
             
                
@@ -232,13 +230,6 @@ function NewTransactionForm() {
             emailInputRef.current.focus();
         }
       
-        if(authCtx.isLoading){
-            setIsLoad(true)
-           }
-           else{
-            setIsLoad(false)
-           }
-       
     }
 
    
@@ -252,7 +243,7 @@ function NewTransactionForm() {
         return (
             <Card className={classes.login}>
                 
-                {(isLoading || isLoad) && <Modal />}
+                {isLoading && <Modal />}
                 {infoData &&  (
                     <InfModal
                         title={infoData.title}

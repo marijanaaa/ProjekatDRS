@@ -17,6 +17,8 @@ const AuthContext = React.createContext({
   getTransaction: () => {},
   isLoading: false,
   loading : (data) => {},
+  data : false,
+  addData : (data) => {},
  
 
 });
@@ -59,6 +61,7 @@ export const AuthContextProvider = (props) => {
   const [token, setToken] = useState(initialToken);
  const [istrans, setIsTran] = useState(false);
  const [isLoad, setIsLoading] = useState(false);
+ const[dataNew, setDataNew] = useState(false);
   const userIsLoggedIn = !!token;
   const [userIsVerify, setUserVer] = useState(false);
 
@@ -83,6 +86,10 @@ export const AuthContextProvider = (props) => {
  
      
    };
+   const addDataNew =(data) => {
+    setDataNew(data);
+    
+   }
  
 const setLoad = (data)=>{
   setIsLoading(data)
@@ -201,6 +208,9 @@ const setingTr =() =>{
     setTr : setingTr,
     loading : setLoad,
     isLoading : isLoad,
+    data : dataNew,
+    addData: addDataNew,
+
     
    
 

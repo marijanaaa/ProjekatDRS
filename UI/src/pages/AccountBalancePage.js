@@ -1,5 +1,11 @@
-import React, { useContext, useState, useEffect } from "react";
-//import useHttp from "../hook/useHttp";
+
+
+
+import React, {useContext, useState, useEffect} from "react";
+
+import InfModal from '../components/component/modals/InfModal';
+
+import { useHistory } from 'react-router-dom';
 import Modal from "../components/component/modals/Modal";
 
 import classes from "../components/component/forms/LoginForm.module.css";
@@ -9,7 +15,10 @@ import AuthContext from '../store/auth-context';
 function AccountBalancePage() {
 
   const { isLoading, sendRequest } = useHttp();
-
+  const [isLoad, setIsLoad] = useState(false);
+ 
+  const [infoData, setInfoData] = useState(null);
+  const history = useHistory();
   const [dollars, setDollars] = useState(null);
   const [BTC, setBTC] = useState(null);
   const [BUSD, setBUSD] = useState(null);
@@ -18,7 +27,51 @@ function AccountBalancePage() {
    const [USDT, setUSDT] = useState(null);
   const authCtx = useContext(AuthContext);
 
+
+
+
+
+
+ 
+
+
+
+  
+
+
+
   useEffect(() => {
+
+
+
+    console.log(authCtx.isLoading)
+
+    if(authCtx.isLoading){
+      
+       setIsLoad(true)
+       if(authCtx.data){
+          
+           authCtx.loading(false)
+           setIsLoad(false)
+           setInfoData({
+               title: "Success",
+               message:" Transaction sucessed" ,
+           });
+          // authCtx.loading(false)
+          
+         
+             
+              // history.replace("/");
+           
+              authCtx.addData(false)
+       }
+       
+    }
+    
+   
+
+
+
 
   async function getCurrency() {
     const requestConfig = {
@@ -59,8 +112,16 @@ function AccountBalancePage() {
 
 
 
-    }, [authCtx.token, sendRequest]);
+    }, [authCtx.token, sendRequest, infoData, authCtx.addData]);
 
+    function hideErrorModalHandler() {//da se ukloni prozorcic
+      setInfoData(null);
+  }
+  function hideSuccessModalHandler() { //isto da ukloni prozor sa obavestenjem
+      setInfoData(null);
+     history.replace("/balance")
+  
+  }
 
   return (
     <>
@@ -69,6 +130,13 @@ function AccountBalancePage() {
       
       <Card className={classes.account}>
       {isLoading && <Modal/>}
+      {infoData &&  (
+                    <InfModal
+                        title={infoData.title}
+                        message={infoData.message}
+                        onConfirm={infoData.title === "Success" ? hideSuccessModalHandler : hideErrorModalHandler}
+                    />
+                )}
         <div>
           <h1 style={{ textAlign : 'center' }}>Account balance</h1>
           
