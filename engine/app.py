@@ -29,6 +29,7 @@ cryptocurrencyCollection = db["cryptocurrencies"]
 app = Flask(__name__)
 CORS(app)
 sockets=Sock(app)
+#sockets.init_app(app)
 app.config["SECRET_KEY"] = "004f2af45d3a4e161a7dd2d17fdae47f"
 app.config["JWT_ACCESS_TOKEN_EXPIRES"] = datetime.timedelta(hours=1)
 _jwt = JWTManager(app)
@@ -190,8 +191,16 @@ def exchange_cripto():
 
 def increase_crypto(email,symbol,amount):
     result = cryptocurrencyCollection.find_one({"email":email})
+    if result == None:
+        obj = {'email':email,'dollars':0,'BTC':0,'ETH':0,'USDT':0,'BUSD':0,'DOGE':0}
+        res = cryptocurrencyCollection.insert_one(obj)
+        if res != None:
+            return amount
+        #provere fale
     result = json.dumps(result, default=str)
     result_dict = json.loads(result)
+    print(symbol)
+    print(result_dict[symbol])
     old_amount = float(result_dict[symbol])
     print(amount)
     print(result_dict[symbol])
@@ -384,8 +393,11 @@ def verify_notification(sockets):
         print(parametrs)
         pom=parametrs
         parametrs=None
-        result = transaction_class.transaction_processing(pom)       
-        sockets.send(result)
+        result = transaction_class.transaction_processing(pom)
+        print("kaca " + str(result))  
+        
+        sockets.send(str(result))
+        
 
 
 if __name__=='__main__':

@@ -31,7 +31,7 @@ def transaction_processing(parametrs):
                                'cryptocurrency':parametrs["cryptocurrency"],'amount':parametrs["amount"],'state': 'PROCESSED',
                                'date':datetime.now(tz=pytz.UTC).strftime("%m/%d/%Y %H:%M:%S")})
     
-    res=update_cryptocurrency(parametrs["sender_email"],parametrs["cryptocurrency"],decrease_crypto(parametrs["sender_email"],parametrs["cryptocurrency"],parametrs["amount"]))
-    res=update_cryptocurrency(parametrs["receiver_email"],parametrs["cryptocurrency"],increase_crypto(parametrs["receiver_email"],parametrs["cryptocurrency"],parametrs["amount"]))
+    update_cryptocurrency(parametrs["sender_email"],parametrs["cryptocurrency"],decrease_crypto(parametrs["sender_email"],parametrs["cryptocurrency"],parametrs["amount"]))
+    update_cryptocurrency(parametrs["receiver_email"],parametrs["cryptocurrency"],increase_crypto(parametrs["receiver_email"],parametrs["cryptocurrency"],parametrs["amount"]))
 
     return True

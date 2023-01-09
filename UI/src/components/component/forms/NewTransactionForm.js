@@ -92,29 +92,15 @@ function NewTransactionForm() {
     const { isValid: emailIsValid } = emailState;
 
     useEffect(() => {
+      
+        
         const identifier = setTimeout(() => {
             console.log('Checking form validity!');
-            setFormIsValid(amountIsValid, emailIsValid, IsL);
+            setFormIsValid(amountIsValid, emailIsValid);
 
         }, 500);
 
 
-        let verifySocket = new WebSocket("ws://localhost:5000/verifysocket");
-        console.log("soket");
-        console.log("usao sam iznad socket fje")
-       
-
-
-        verifySocket.addEventListener('message', (event) => {
-            console.log("cekam odg")
-            console.log(event.data);
-           // alert(event.data)
-            if(event.data === "True"){
-                console.log("promenio sam se")
-                console.log(IsL)
-                setL(true)
-            }
-        });
           //verifySocket.onmessage=function(ev){
             //console.log("Usao sam u fju ")
             //setIsLoad(true)
@@ -122,13 +108,13 @@ function NewTransactionForm() {
            // console.log(ev.data)
            //alert(ev.data)
       // }
-       console.log("izasao sam iz fje")
+       
 
         return () => {
             console.log('CLEANUP');
             clearTimeout(identifier);
         };
-    }, [amountIsValid, emailIsValid, IsL]);
+    }, [amountIsValid, emailIsValid]);
 
     const amountChangeHandler = (event) => {
         dispatchAmount({ type: 'USER_INPUT', val: event.target.value });
@@ -162,6 +148,7 @@ function NewTransactionForm() {
     }
 
     async function submitHandler(event) {
+
         event.preventDefault();
 
         if (formIsValid) {
@@ -194,17 +181,39 @@ function NewTransactionForm() {
                 });
 
             }
-            else {
+            else{
+                authCtx.loading(true)
+        
+        let verifySocket = new WebSocket("ws://localhost:5000/verifysocket");
+       
+
+
+        verifySocket.addEventListener('message', (event) => {
+            console.log("cekam odg")
+            
+  
+           // alert(event.data)
+            if(event.data === "True"){
+               
+               
+                setInfoData({
+                    title: "Succes",
+                    message: "The transaction was completed successfully",
+                });
+               
+                authCtx.loading(false)
+             verifySocket.close()
                 
-                if(IsL){
-                    setIsLoad(false) //vise ne treba da se vrti
-                }
-                else{
-                    setIsLoad(true)
-                }
             
-            
-        }
+               
+            }
+         
+        });
+              
+             
+               
+            }
+           
            // verifySocket.onmessage=function(ev){
             
              //console.log(ev.data)
@@ -213,13 +222,7 @@ function NewTransactionForm() {
             
 
            
-            if(authCtx.isTransaction){
-                setInfoData({
-                    title: "Success",
-                    message: "Transaction get",
-                });
-
-            }
+           
 
         }
         else if (!amountIsValid) {
@@ -228,12 +231,28 @@ function NewTransactionForm() {
         else if (!emailIsValid) {
             emailInputRef.current.focus();
         }
+      
+        if(authCtx.isLoading){
+            setIsLoad(true)
+           }
+           else{
+            setIsLoad(false)
+           }
+       
     }
 
+   
+   //if(authCtx.isLoading){//da kad ode na drugu stranicu i vrati se i dalje se vrti krug
+    // setIsLoad(true)
+  // }
+   
+   
+    
+   
         return (
             <Card className={classes.login}>
-                {isLoad && <Modal/>}
-                {isLoading && <Modal />}
+                
+                {(isLoading || isLoad) && <Modal />}
                 {infoData &&  (
                     <InfModal
                         title={infoData.title}

@@ -19,7 +19,7 @@ function App() {
   const ctx = useContext(AuthContext);
   //const userIsAdmin = ctx.user !== null && ctx.user.userType === "ADMIN";
   return (
-    <React.Fragment>
+      <React.Fragment>
       <MainHeader />
       <Switch>
        <Route path="/" exact>
@@ -55,7 +55,7 @@ function App() {
         {ctx.isLoggedIn && <AccountBalancePage />}
           {!ctx.isLoggedIn && <Redirect to="/" />}
         </Route>
-
+        
         <Route path="/cardTransaction">
         {ctx.isLoggedIn && ctx.isVerify && <PayFromCardPage />}
           {!ctx.isLoggedIn && <Redirect to="/" />}

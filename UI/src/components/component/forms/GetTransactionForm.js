@@ -8,16 +8,21 @@ import AuthContext from '../../../store/auth-context';
 
 
 function GetTransactionForm(){
+
     const { isLoading, sendRequest } = useHttp();
+  
 const [dataNew, setDataNew] = useState();
+
 
 const authCtx = useContext(AuthContext);
 
 
 
+          
 
 
  useEffect(() => {
+  
 
     async function getTransaction() {
       const requestConfig = {
