@@ -13,13 +13,18 @@ from functools import wraps
 import uuid
 from flask_jwt_extended import create_access_token,get_jwt,get_jwt_identity, \
                                unset_jwt_cookies, jwt_required, JWTManager
-import transaction_class
 import threading
 from flask_sock import Sock
 from function_for_sorting import sort_transactions_up, sort_transactions_down,sort_transaction_date_up,sort_transaction_date_down
 from function_for_filtering import filtering_amount,filtering_datetime,filtering_by_email
 from bson import json_util
 from itertools import chain
+from multiprocessing import Process
+import multiprocessing as mp
+import transaction_class
+from database_functions import *
+
+qu=mp.Queue(maxsize=100)
 
 #collections
 userCollection = db["users"]
@@ -33,7 +38,6 @@ sockets=Sock(app)
 app.config["SECRET_KEY"] = "004f2af45d3a4e161a7dd2d17fdae47f"
 app.config["JWT_ACCESS_TOKEN_EXPIRES"] = datetime.timedelta(hours=1)
 _jwt = JWTManager(app)
-parametrs = None
 
 @app.after_request
 def refresh_expiring_jwts(response):
@@ -183,38 +187,12 @@ def exchange_cripto():
     obj = json.loads(obj)
     if float(obj[symbol_from])> float(amount):
         result=exchange_cryptocurrency(symbol_from,symbol_to,float(amount))
-        update_symbol_from = update_cryptocurrency(email, symbol_from, decrease_crypto(email,symbol_from,float(amount)))
-        update_symbol_to=update_cryptocurrency(email,symbol_to,increase_crypto(email,symbol_to,result))
+        update_symbol_from = update_cryptocurrency(cryptocurrencyCollection,email, symbol_from, decrease_crypto(cryptocurrencyCollection,email,symbol_from,float(amount)))
+        update_symbol_to=update_cryptocurrency(cryptocurrencyCollection,email,symbol_to,increase_crypto(cryptocurrencyCollection,email,symbol_to,result))
         return jsonify({"result":"OK"})
     else:
         return jsonify({"result":"You don't have enough cryptocurrency for this exchange"})
 
-def increase_crypto(email,symbol,amount):
-    result = cryptocurrencyCollection.find_one({"email":email})
-    if result == None:
-        obj = {'email':email,'dollars':0,'BTC':0,'ETH':0,'USDT':0,'BUSD':0,'DOGE':0}
-        res = cryptocurrencyCollection.insert_one(obj)
-        if res != None:
-            return amount
-        #provere fale
-    result = json.dumps(result, default=str)
-    result_dict = json.loads(result)
-    print(symbol)
-    print(result_dict[symbol])
-    old_amount = float(result_dict[symbol])
-    print(amount)
-    print(result_dict[symbol])
-    new_amount = old_amount + float(amount)
-    print(new_amount)
-    return new_amount
-
-def decrease_crypto(email, symbol,amount):
-    result = cryptocurrencyCollection.find_one({"email":email})
-    result = json.dumps(result, default=str)
-    result_dict = json.loads(result)
-    old_amount = float(result_dict[symbol])
-    new_amount = old_amount - float(amount)
-    return new_amount
     
 @app.route('/exchangeDollarsToCrypto', methods=["POST"])
 @jwt_required()
@@ -229,12 +207,12 @@ def exhange_dollars_to_crypto():
     #need to update old crypto amount adding new amount
     
     if email_exists == None:
-        result = insert_cryptocurrency(email, currency, coin_amount, amount_in_dollars)
+        result = insert_cryptocurrency(cryptocurrencyCollection,email, currency, coin_amount, amount_in_dollars)
         res = json.dumps(email_exists, default=str)
         result_dict = json.loads(res)
         if float(result_dict["dollars"]) < float(amount_in_dollars):
             return jsonify({'result':'ERROR'})
-        res = decrease_dollar_amount(email, amount_in_dollars)
+        res = decrease_dollar_amount(cryptocurrencyCollection,email, amount_in_dollars)
         if result != None and res == "OK":
             return jsonify({'result':'OK'})
         return jsonify({'result':'ERROR'})
@@ -242,8 +220,8 @@ def exhange_dollars_to_crypto():
     result_dict = json.loads(res)
     if float(result_dict["dollars"]) < float(amount_in_dollars):
         return jsonify({'result':'ERROR'})
-    result = update_cryptocurrency(email, currency,increase_crypto(email,currency,coin_amount))
-    res = decrease_dollar_amount(email, amount_in_dollars)
+    result = update_cryptocurrency(cryptocurrencyCollection,email, currency,increase_crypto(cryptocurrencyCollection,email,currency,coin_amount))
+    res = decrease_dollar_amount(cryptocurrencyCollection,email, amount_in_dollars)
     if result.matched_count > 0 and res == "OK":
         return jsonify({"result":"OK"})
     return jsonify({"result":"ERROR"})
@@ -261,43 +239,6 @@ def get_account_balance():
     if result != None:
         return json.dumps(obj, default=str)
     return jsonify({'result':'ERROR'})
-
-def decrease_dollar_amount(email, amount_in_dollars):
-    result = cryptocurrencyCollection.find_one({"email":email})
-    result = json.dumps(result, default=str)
-    result_dict = json.loads(result)
-    old_amount = float(result_dict["dollars"])
-    new_amount = old_amount - float(amount_in_dollars)
-    #updating dollar amount
-    query={'email':email}
-    new_value = {"$set":{'dollars':new_amount}}
-    result = cryptocurrencyCollection.update_one(query,new_value)
-    if result.matched_count > 0:
-        return "OK"
-    return "ERROR"
-
-def update_cryptocurrency(email, currency, coin_amount):
-    result = cryptocurrencyCollection.find_one({"email":email})
-    result = json.dumps(result, default=str)
-    query={'email':email}
-    new_value = {"$set":{currency:coin_amount}}
-    result = cryptocurrencyCollection.update_one(query,new_value)
-    return result
-
-def insert_cryptocurrency(email, currency, coin_amount):
-    obj = {'email':email,'dollars':0,'BTC':0,'ETH':0,'USDT':0,'BUSD':0,'DOGE':0}
-    if currency == 'BTC':
-        obj['BTC'] = coin_amount
-    elif currency == 'ETH':
-        obj['ETH'] = coin_amount
-    elif currency == 'USDT':
-        obj['USDT'] = coin_amount
-    elif currency == 'BUSD':
-        obj['BUSD'] = coin_amount
-    elif currency == 'DOGE':
-        obj['DOGE'] = coin_amount
-    result = cryptocurrencyCollection.insert_one(obj)
-    return result
 
 
 def Merge(dict1, dict2):
@@ -347,6 +288,7 @@ def sort_transactions():
     return json.dumps(result, default=json_util.default)
 
 @app.route('/filterTransactions', methods=["POST"])
+@jwt_required()
 def filter_transactions():
     email = request.get_json(force=True).get('email')
     date = request.get_json(force=True).get('date')
@@ -374,31 +316,28 @@ def filter_transactions():
 
 
 @app.route('/newTransaction',methods=["POST"])
+@jwt_required()
 def new_transaction():
     sender_email = request.get_json(force=True).get('sender_email')
     receiver_email = request.get_json(force=True).get('receiver_email')
     amount = request.get_json(force=True).get('amount')
     cryptocurrency = request.get_json(force=True).get('cryptocurrency')
-    global parametrs
     parametrs={"sender_email":sender_email,"receiver_email":receiver_email,"amount":amount,"cryptocurrency":cryptocurrency}
+    p=Process(target=transaction_class.transaction_processing,args=(parametrs,qu))
+    p.start()
+    
     return jsonify({"result":"OK"})
 
 
 
 @sockets.route("/verifysocket")
 def verify_notification(sockets):
-    global parametrs
-    print(parametrs)
-    while parametrs!=None: 
-        print(parametrs)
-        pom=parametrs
-        parametrs=None
-        result = transaction_class.transaction_processing(pom)
-        print("kaca " + str(result))  
+    result=qu.get()
+    if result=="success":
+        sockets.send(True)
+    elif result=="denied":
+        sockets.send(True)
         
-        sockets.send(str(result))
-        
-
 
 if __name__=='__main__':
     app.run(host="0.0.0.0", port=5000)
