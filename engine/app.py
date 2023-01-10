@@ -248,8 +248,8 @@ def Merge(dict1, dict2):
 @jwt_required()
 def get_transactions():
     email = request.get_json(force=True).get('email')
-    sender_cursor = transactionCollection.find({"sender": email})
-    receiver_cursor = transactionCollection.find({"receiver": email})
+    sender_cursor = transactionCollection.find({"sender": email,'state': 'PROCESSED'})
+    receiver_cursor = transactionCollection.find({"receiver": email,'state': 'PROCESSED'})
     union_cursor = chain(sender_cursor, receiver_cursor)
     json_docs = []
     for doc in union_cursor:
@@ -267,8 +267,8 @@ def sort_transactions():
     factor = request.get_json(force=True).get('factor')
     value = request.get_json(force=True).get('value')
     email = request.get_json(force=True).get('email')
-    sender_cursor = transactionCollection.find({"sender": email})
-    receiver_cursor = transactionCollection.find({"receiver": email})
+    sender_cursor = transactionCollection.find({"sender": email,'state': 'PROCESSED'})
+    receiver_cursor = transactionCollection.find({"receiver": email,'state': 'PROCESSED'})
     union_cursor = chain(sender_cursor, receiver_cursor)  
     json_docs = []
     for doc in union_cursor:
@@ -295,8 +295,8 @@ def filter_transactions():
     recvEmail = request.get_json(force=True).get('recvEmail')
     min=request.get_json(force=True).get('min')
     max=request.get_json(force=True).get('max')
-    sender_cursor = transactionCollection.find({"sender": email})
-    receiver_cursor = transactionCollection.find({"receiver": email})
+    sender_cursor = transactionCollection.find({"sender": email,'state': 'PROCESSED'})
+    receiver_cursor = transactionCollection.find({"receiver": email,'state': 'PROCESSED'})
     union_cursor = chain(sender_cursor, receiver_cursor)
     json_docs = []
     for doc in union_cursor:
@@ -304,9 +304,23 @@ def filter_transactions():
         del json_doc['_id']
         del json_doc['hash']
         json_docs.append(json_doc)
-    if date != None:
+    result=[]
+    if date != "" and receiver_cursor!="" and min!="" and max!="":
         result=filtering_datetime(date,json_docs)
-    elif recvEmail!=None:
+        result=filtering_by_email(recvEmail,result)
+        result=filtering_amount(float(min),float(max),result)
+    elif recvEmail!="" and date!="":
+        result=filtering_by_email(recvEmail,json_docs)
+        result=filtering_datetime(date,result)
+    elif recvEmail!="" and min!="" and max!="":
+        result=filtering_by_email(recvEmail,json_docs)
+        result=filtering_amount(float(min),float(max),result)
+    elif date!="" and min!="" and max!="":
+        result=filtering_datetime(date,json_docs)
+        result=filtering_amount(float(min),float(max),result)
+    elif date!="":
+        result=filtering_datetime(date,json_docs)
+    elif recvEmail!="":
         result=filtering_by_email(recvEmail,json_docs)
     else :
         min=float(min)
