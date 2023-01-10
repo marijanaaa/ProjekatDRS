@@ -73,7 +73,7 @@ function SortForm() {
 
     function hideSuccessModalHandler() { //isto da ukloni prozor sa obavestenjem
         setInfoData(null);
-        history.replace('/');
+       // history.replace('/');
     }
 
     async function submitHandler(event) {
@@ -101,7 +101,7 @@ function SortForm() {
     
             const data = await sendRequest(requestConfig);
 
-             console.log(data)
+            
             if (data.result === 'ERROR') {//promeniti u skladu sa odg sa servera
                 setInfoData({
                     title: "Error",
@@ -110,10 +110,8 @@ function SortForm() {
 
             }
             else {
-                setInfoData({
-                    title: "Success",
-                    message: "Succesfuly send!",
-                });
+                authCtx.getTransaction(data)
+               
 
             }
 

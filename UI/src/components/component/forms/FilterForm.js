@@ -24,7 +24,7 @@ const minReducer = (state, action) => {
     if (action.type === 'INPUT_BLUR') {
       return { value: state.value, isValid: true };
     }
-    return { value: '', isValid: false };
+    return { value: '', isValid: true };
   };
   
   const maxReducer = (state, action) => {
@@ -34,7 +34,7 @@ const minReducer = (state, action) => {
     if (action.type === 'INPUT_BLUR') {
       return { value: state.value, isValid: true };
     }
-    return { value: '', isValid: false };
+    return { value: '', isValid: true };
   };
   const dateReducer = (state, action) => {
     if (action.type === 'USER_INPUT') {
@@ -43,7 +43,7 @@ const minReducer = (state, action) => {
     if (action.type === 'INPUT_BLUR') {
       return { value: state.value, isValid: true };
     }
-    return { value: '', isValid: false };
+    return { value: '', isValid: true };
   };
 
 
@@ -55,7 +55,7 @@ const minReducer = (state, action) => {
     if (action.type === 'INPUT_BLUR') {
       return { value: state.value, isValid: state.value.includes('@') };
     }
-    return { value: '', isValid: false };
+    return { value: '', isValid: true };
   };
 
 
@@ -83,7 +83,7 @@ function FilterForm() {
     });
     const [emailState, dispatchEmail] = useReducer(emailReducer, {
         value: '',
-        isValid: null,
+        isValid: true,
       });
     const authCtx = useContext(AuthContext);
     const dateInputRef = useRef();
@@ -177,10 +177,9 @@ function FilterForm() {
 
             }
             else {
-                setInfoData({
-                    title: "Success",
-                    message: "Succesfuly send!",
-                });
+              console.log(data)
+              authCtx.getTransaction(data)
+               
 
             }
 

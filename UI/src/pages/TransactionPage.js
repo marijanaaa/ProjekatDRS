@@ -78,6 +78,28 @@ function TransactionPage() {
                         onConfirm={infoData.title === "Success" ? hideSuccessModalHandler : hideErrorModalHandler}
                     />
                 )}
+                 <div className="App">
+      <table>
+        <tr>
+          <th>Sender</th>
+          <th>Receiver</th>
+          <th>Amount</th>
+          <th>Criptocurrency</th> 
+          <th>Date</th>
+        </tr>
+       
+        {Object.entries(authCtx.transaction)
+           .map( ([key, value]) => <tr> <td>{value.sender}</td> <td>{value.receiver}</td> <td>{value.amount} </td> <td>{value.cryptocurrency}</td>  <td>{value.date}</td></tr> )}
+        
+      </table>
+    </div>   
+     
+     
+      
+        
+        
+          
+        
        <GetTransactionForm/>
          
           <SortForm/>
