@@ -27,7 +27,7 @@ const authCtx = useContext(AuthContext);
 
     async function getTransaction() {
       const requestConfig = {
-        url: 'http://localhost:5000/getTransactions',
+        url: 'http://localhost:5000/transactions/getTransactions',
         method: "POST",
         body: JSON.stringify({
           email:authCtx.user.email,

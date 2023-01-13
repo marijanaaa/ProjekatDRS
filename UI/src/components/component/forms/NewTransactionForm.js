@@ -155,7 +155,7 @@ function NewTransactionForm() {
         if (formIsValid) {
 
             const requestConfig = {
-                url: 'http://localhost:5000/newTransaction',
+                url: 'http://localhost:5000/transactions/newTransaction',
                 method: "POST",
                 body: JSON.stringify({
                     sender_email: authCtx.user.email,
@@ -185,7 +185,7 @@ function NewTransactionForm() {
             else{
                 authCtx.loading(true)
         
-        let verifySocket = new WebSocket("ws://localhost:5000/verifysocket");
+        let verifySocket = new WebSocket("ws://localhost:5000/transactions/verifysocket");
        
        
 

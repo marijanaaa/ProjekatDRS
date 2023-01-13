@@ -116,7 +116,7 @@ function BuyCurrenciesForm() {
         if (formIsValid) {
 
             const requestConfig = {
-                url: 'http://localhost:5000/exchangeDollarsToCrypto',
+                url: 'http://localhost:5000/exchanges/exchangeDollarsToCrypto',
                 method: "POST",
                 body: JSON.stringify({
                     email: authCtx.user.email,

@@ -116,7 +116,7 @@ function ExchangeCurrenciesForm() {
         if (formIsValid) {
 
             const requestConfig = {
-                url: 'http://localhost:5000/exchangecripto',
+                url: 'http://localhost:5000/exchanges/exchangecripto',
                 method: "POST",
                 body: JSON.stringify({
                     email: authCtx.user.email,

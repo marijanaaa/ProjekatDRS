@@ -148,7 +148,7 @@ function FilterForm() {
        
 
             const requestConfig = {
-                url: 'http://localhost:5000/filterTransactions',
+                url: 'http://localhost:5000/transactions/filterTransactions',
                 method: "POST",
                 body: JSON.stringify({
                     email: authCtx.user.email,

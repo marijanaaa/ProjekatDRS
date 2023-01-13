@@ -82,7 +82,7 @@ function SortForm() {
        
 
             const requestConfig = {
-                url: 'http://localhost:5000/sortTransactions',
+                url: 'http://localhost:5000/transactions/sortTransactions',
                 method: "POST",
                 body: JSON.stringify({
                     email: authCtx.user.email,

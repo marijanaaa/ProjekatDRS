@@ -95,7 +95,7 @@ function PayFromCardForm() {
         if (formIsValid) {
 
             const requestConfig = {
-                url: 'http://localhost:5000/cardTransaction',
+                url: 'http://localhost:5000/exchanges/cardTransaction',
                 method: "POST",
                 body: JSON.stringify({
                     email: authCtx.user.email,
