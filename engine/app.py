@@ -47,7 +47,7 @@ def refresh_expiring_jwts(response):
         return response
 
 @app.route('/registration', methods=['POST'])
-def user_registration():
+def user_registration():  
     name = request.get_json(force=True).get('name')
     lastname = request.get_json(force=True).get('lastname')
     address = request.get_json(force=True).get('address')
@@ -57,19 +57,25 @@ def user_registration():
     email = request.get_json(force=True).get('email')
     password = request.get_json(force=True).get('password')
     hashed_password = generate_password_hash(password, method='sha256')
-    result = userCollection.insert_one({'name':name,'lastname':lastname,'address':address,'city':city,
+    user = userCollection.find_one({"email":email})
+    if user == None:
+        result = userCollection.insert_one({'name':name,'lastname':lastname,'address':address,'city':city,
                                         'country':country,'number':number,'email':email,'password':hashed_password,
                                         'isVerified':False})
-    if result != None:
-        return jsonify({'result':'OK'})
-    return jsonify({'result':'ERROR'}) 
+        if result != None:
+            return jsonify({'result':'OK'})
+        return jsonify({'result':'Can not register user'}) 
+    else:
+        return jsonify({'result':'Email already exists'}) 
     
 @app.route('/login', methods=["POST"])
 def user_login():
     email = request.get_json(force=True).get('email')
     password = request.get_json(force=True).get('password')
-
+    
     user = userCollection.find_one({"email":email})
+    if user==None:
+        return {"result": "Wrong email"}
     user = json.dumps(user, default=str) 
     dict_user = json.loads(user) 
 
@@ -113,7 +119,7 @@ def edit_profile():
             "address":address, "city":city, "country":country,
             "number": number,"email":email,"password": password, 
             "isVerified": dict_user["isVerified"]})
-    return jsonify({"result":"ERROR"})
+    return jsonify({"result":"Can not edit user"})
 
 
 
@@ -129,7 +135,7 @@ def get_account_balance():
     #initial object with all zeros
     if result != None:
         return json.dumps(obj, default=str)
-    return jsonify({'result':'ERROR'})
+    return jsonify({'result':'Can not load account balance from this user'})
 
 
 def Merge(dict1, dict2):
