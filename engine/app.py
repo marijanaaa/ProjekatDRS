@@ -116,26 +116,6 @@ def edit_profile():
     return jsonify({"result":"ERROR"})
 
 
-@app.route('/verification', methods=["POST"])
-@jwt_required()
-def user_verification():
-    email = request.get_json(force=True).get('email')
-    number = request.get_json(force=True).get('number')
-    name = request.get_json(force=True).get('name')
-    expiration_date = request.get_json(force=True).get('expiration_date')
-    list = expiration_date.split('-')
-    year = list[0]
-    month = list[1]
-    day = list[2]
-    security_code = request.get_json(force=True).get('security_code')
-    isVerified = verification(number, name, year, month, day, security_code)
-    if(isVerified == True):
-        query={'email':email}
-        new_value = {"$set":{'isVerfied':True}}
-        result = userCollection.update_one(query,new_value)
-        if result.matched_count > 0:
-            return jsonify({"result":"OK"})
-    return jsonify({"result":"ERROR"})
 
 @app.route('/getAccountBalance',methods=["POST"] )
 @jwt_required()

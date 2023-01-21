@@ -189,7 +189,7 @@ import InfModal from '../modals/InfModal';
      if(formIsValid){
      
       const requestConfig = {
-        url: 'http://localhost:5000/verification',
+        url: 'http://localhost:5000/exchanges/verification',
         method: "POST",
         body: JSON.stringify({
           email:authCtx.user.email,

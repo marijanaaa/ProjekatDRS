@@ -126,4 +126,4 @@ def verify_notification(sockets):
     if result=="success":
         sockets.send(True)
     elif result=="denied":
-        sockets.send(True)     
+        sockets.send(False)     
