@@ -111,21 +111,38 @@ function PayFromCardForm() {
             };
             const data = await sendRequest(requestConfig);
 
-            if (data.result === 'ERROR') {//promeniti u skladu sa odg sa servera
+
+  
+            if (data.result === 'ERROR') {
                 setInfoData({
                     title: "Error",
-                    message: "Payment error",
+                    message: "Error in transaction",
                 });
 
             }
-            else {
-                setInfoData({
-                    title: "Success",
-                    message: "Money successfully paid into the account!",
-                });
+            else{
+                authCtx.loading(true)
+                authCtx.addType("Uplati sebi na racun")
+        let verifySocket = new WebSocket("ws://localhost:5000/exchanges/cardTransactionSocket");
+       
+       
 
+        verifySocket.addEventListener('message', (event) => {
+           
+           
+           
+            if(event.data === "True"){
+                authCtx.addData("Uplata dolara na svoj racun")
             }
-
+            else{
+                authCtx.addData("Uplata na svoj racun nije uspela")
+            }
+         
+        });
+              
+             
+  
+            }
         }
         else if (!amountIsValid) {
             amountInputRef.current.focus();

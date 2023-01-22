@@ -43,7 +43,7 @@ import InfModal from '../modals/InfModal';
     
     const { isLoading, sendRequest } = useHttp();
     
-    const [infoData, setInfoData] = useState(null);//da ispise sta se desilo
+    const [infoData, setInfoData] = useState(null);
 
     const [formIsValid, setFormIsValid] = useState(false);
   
@@ -96,18 +96,16 @@ import InfModal from '../modals/InfModal';
     }, [emailIsValid, passwordIsValid]);
   
     const emailChangeHandler = (event) => {
-     // console.log(event.target.value);
+     
       dispatchEmail({ type: 'USER_INPUT', val: event.target.value });
   
-      // setFormIsValid(
-      //   event.target.value.includes('@') && passwordState.isValid
-      // );
+     
     };
   
     const passwordChangeHandler = (event) => {
       dispatchPassword({ type: 'USER_INPUT', val: event.target.value });
   
-      // setFormIsValid(emailState.isValid && event.target.value.trim().length > 6);
+     
     };
   
     const validateEmailHandler = () => {
@@ -122,11 +120,11 @@ import InfModal from '../modals/InfModal';
 
    
   
-    function hideErrorModalHandler() {//da se ukloni prozorcic
+    function hideErrorModalHandler() {
       setInfoData(null);
    }
   
-   function hideSuccessModalHandler() { //isto da ukloni prozor sa obavestenjem
+   function hideSuccessModalHandler() { 
     setInfoData(null);
     history.replace('/');
   }
@@ -154,36 +152,27 @@ import InfModal from '../modals/InfModal';
         
       };
 
-      //token:true-znaci da ocekuje da nam ga server napravi.
+      
 
       const data = await sendRequest(requestConfig);
      
-      //u data je ono sto server posalje kao odgovor(u firebase salje name)
+   
   
       var count = Object.keys(data).length; 
 
-      if(count !== 0 ){//promeniti u skladu sa odg sa servera
+      if(count !== 0 ){
        
-        authCtx.login(data); //za sada ce to biti neki token, kasnije ce to biti 
+        authCtx.login(data); 
       
        
        
         }
         else{
-
-
-         
-          setInfoData({
+            setInfoData({
             title:  "Error",
             message: "You entered the wrong email or password!",
           });
-          
-          
-
-
-      
-     
-        }
+           }
 
        
       

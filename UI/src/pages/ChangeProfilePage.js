@@ -15,27 +15,124 @@ function ChangeProfilePage() {
   useEffect(() => {
     console.log(authCtx.isLoading)
 
-   if(authCtx.isLoading){
-     
-      setIsLoad(true)
-      if(authCtx.data){
+    if(authCtx.isLoading){
          
+        setIsLoad(true)
+        if(authCtx.data === "Prenos para uspeo"){
+           
+            authCtx.loading(false)
+            setIsLoad(false)
+            setInfoData({
+                title: "Success",
+                message:" Transaction sucessed" ,
+            });
+               authCtx.addData("nije")
+        }
+        if(authCtx.data === "Prenos para nije uspeo") {
+            authCtx.loading(false)
+            setIsLoad(false)
+            setInfoData({
+                title: "Error",
+                message:" Transaction denied" ,
+            });
+            authCtx.addData("nije")
+        }
+        if(authCtx.data === "Verifikacija uspela"){
+           
+            authCtx.loading(false)
+            setIsLoad(false)      
+         setInfoData({
+        title:  "Success",
+        message: "1$ has been successfully deducted from your card!",
+      });
+            authCtx.addData("nije")
+           
+        }
+        if(authCtx.data === "Verifikacija nije uspela"){
+           
+            authCtx.loading(false)
+            setIsLoad(false)
+            setInfoData({
+                title:  "Error",
+                message: "Card does not exist! ",
+              });
+            authCtx.addData("nije")
+        }
+       
+        if(authCtx.data === "Uplata dolara na svoj racun"){
+           
+          authCtx.loading(false)
+          setIsLoad(false)  
+       setInfoData({
+      title:  "Success",
+      message: "Money successfully paid into the account!",
+    });
+          authCtx.addData("nije")
+         
+      }
+      if(authCtx.data === "Uplata na svoj racun nije uspela"){
+           
+          authCtx.loading(false)
+          setIsLoad(false) 
+       setInfoData({
+      title:  "Error",
+      message: "Money successfully paid into the account!",
+    });
+          authCtx.addData("nije")
+         
+      }
+      if(authCtx.data === "Uspesno ste kupili dolare"){
+           
           authCtx.loading(false)
           setIsLoad(false)
+         
           setInfoData({
               title: "Success",
-              message:" Transaction sucessed" ,
+              message: "You buy criptocurrencies!",
           });
-         // authCtx.loading(false)
          
-        
-            
-             // history.replace("/");
-          
-             authCtx.addData(false)
+             authCtx.addData("nije")
       }
-      
-   }
+      if(authCtx.data === "Neuspesno ste kupili dolare") {
+          authCtx.loading(false)
+          setIsLoad(false)
+        
+              setInfoData({
+                  title: "Success",
+                  message: "Payment error!",
+              });
+             
+
+          authCtx.addData("nije")
+      }
+      if(authCtx.data === "Uspesno ste zamenili valute"){
+           
+          authCtx.loading(false)
+          setIsLoad(false)
+         
+          setInfoData({
+              title: "Success",
+              message: "You change criptocurrencies!",
+          });
+         
+             authCtx.addData("nije")
+      }
+      if(authCtx.data === "Neuspesno ste zamenili valute") {
+          authCtx.loading(false)
+          setIsLoad(false)
+        
+              setInfoData({
+                  title: "Success",
+                  message: "Error in exchange criptocurrencies!",
+              });
+             
+
+          authCtx.addData("nije")
+      }
+     }
+     
+    
+   
    
   
  
@@ -49,7 +146,8 @@ function ChangeProfilePage() {
       setInfoData(null);
   }
   function hideSuccessModalHandler() { //isto da ukloni prozor sa obavestenjem
-      setInfoData(null);
+    authCtx.verify();
+    setInfoData(null);
      history.replace("/edit")
   
   }

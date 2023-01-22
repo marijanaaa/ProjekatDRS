@@ -135,20 +135,37 @@ function ExchangeCurrenciesForm() {
             console.log(currencyInputRef1.current.value)
             const data = await sendRequest(requestConfig);
 
-             console.log(data)
-            if (data.result === 'ERROR') {//promeniti u skladu sa odg sa servera
+
+   
+            if (data.result === 'ERROR') {
                 setInfoData({
                     title: "Error",
-                    message: "Payment error",
+                    message: "Error in transaction",
                 });
 
             }
-            else {
-                setInfoData({
-                    title: "Success",
-                    message: "You buy criptocurrencies!",
-                });
+            else{
+                authCtx.loading(true)
+                 authCtx.addType("Kupi i zameni valute")
+        let verifySocket = new WebSocket("ws://localhost:5000/exchanges/cardCryptoSocket");
+       
+       
 
+        verifySocket.addEventListener('message', (event) => {
+           
+           
+           
+            if(event.data === "True"){
+                authCtx.addData("Uspesno ste zamenili valute")
+            }
+            else{
+                authCtx.addData("Neuspesno ste zamenili valute")
+            }
+         
+        });
+              
+             
+               
             }
 
         }

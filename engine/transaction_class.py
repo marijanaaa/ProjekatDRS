@@ -35,20 +35,20 @@ def transaction_processing(parametrs,q):
                                'cryptocurrency':parametrs["cryptocurrency"],'amount':parametrs["amount"],'state': 'DENIED',
                                'date':datetime.now(tz=pytz.UTC).strftime("%m/%d/%Y %H:%M:%S")})
         q.put("denied")
-
-    hash = create_hash(parametrs["sender_email"], parametrs["receiver_email"], str(parametrs["amount"]))
-    transactionCollection.insert_one({'hash':hash,'sender':parametrs["sender_email"],'receiver':parametrs["receiver_email"],
+    else:
+        hash = create_hash(parametrs["sender_email"], parametrs["receiver_email"], str(parametrs["amount"]))
+        transactionCollection.insert_one({'hash':hash,'sender':parametrs["sender_email"],'receiver':parametrs["receiver_email"],
                                'cryptocurrency':parametrs["cryptocurrency"],'amount':parametrs["amount"],'state': 'PROCESSING',
                                'date':datetime.now(tz=pytz.UTC).strftime("%m/%d/%Y %H:%M:%S")})
 
-    hash = create_hash(parametrs["sender_email"], parametrs["receiver_email"], str(parametrs["amount"]))
-    transactionCollection.insert_one({'hash':hash,'sender':parametrs["sender_email"],'receiver':parametrs["receiver_email"],
+        hash = create_hash(parametrs["sender_email"], parametrs["receiver_email"], str(parametrs["amount"]))
+        transactionCollection.insert_one({'hash':hash,'sender':parametrs["sender_email"],'receiver':parametrs["receiver_email"],
                                'cryptocurrency':parametrs["cryptocurrency"],'amount':parametrs["amount"],'state': 'PROCESSED',
                                'date':datetime.now(tz=pytz.UTC).strftime("%m/%d/%Y %H:%M:%S")})
 
-    update_cryptocurrency(cryptocurrencyCollection,parametrs["sender_email"],parametrs["cryptocurrency"],decrease_crypto(cryptocurrencyCollection,parametrs["sender_email"],parametrs["cryptocurrency"],parametrs["amount"]))
-    update_cryptocurrency(cryptocurrencyCollection,parametrs["receiver_email"],parametrs["cryptocurrency"],increase_crypto(cryptocurrencyCollection,parametrs["receiver_email"],parametrs["cryptocurrency"],parametrs["amount"]))
-    q.put("success")
+        update_cryptocurrency(cryptocurrencyCollection,parametrs["sender_email"],parametrs["cryptocurrency"],decrease_crypto(cryptocurrencyCollection,parametrs["sender_email"],parametrs["cryptocurrency"],parametrs["amount"]))
+        update_cryptocurrency(cryptocurrencyCollection,parametrs["receiver_email"],parametrs["cryptocurrency"],increase_crypto(cryptocurrencyCollection,parametrs["receiver_email"],parametrs["cryptocurrency"],parametrs["amount"]))
+        q.put("success")
 
 def card_transaction(email,amount_in_dollars,queue):
     time.sleep(20)

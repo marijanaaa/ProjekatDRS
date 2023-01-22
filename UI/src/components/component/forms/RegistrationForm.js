@@ -110,9 +110,9 @@ import React, {
   
   function RegistrationForm() {
     const history = useHistory();
-    const { isLoading, sendRequest } = useHttp(); //koristimo hook koji je odvojen
+    const { isLoading, sendRequest } = useHttp(); 
     const ctx = useContext(AuthContext);
-    const [infoData, setInfoData] = useState(null);//da ispise sta se desilo
+    const [infoData, setInfoData] = useState(null);
     
 
     
@@ -202,12 +202,10 @@ import React, {
   
 
     const nameChangeHandler = (event) => {
-     // console.log(event.target.value);
+    
       dispatchName({ type: 'USER_INPUT', val: event.target.value });
   
-      // setFormIsValid(
-      //   event.target.value.includes('@') && passwordState.isValid
-      // );
+     
     };
   
 
@@ -216,12 +214,10 @@ import React, {
     };
   
     const lastNameChangeHandler = (event) => {
-      //console.log(event.target.value)
+     
       dispatchLastName({ type: 'USER_INPUT', val: event.target.value });
   
-      // setFormIsValid(
-      //   event.target.value.includes('@') && passwordState.isValid
-      // );
+    
     };
   
 
@@ -234,9 +230,7 @@ import React, {
     const addressChangeHandler = (event) => {
       dispatchAddress({ type: 'USER_INPUT', val: event.target.value });
   
-      // setFormIsValid(
-      //   event.target.value.includes('@') && passwordState.isValid
-      // );
+     
     };
   
 
@@ -248,9 +242,7 @@ import React, {
     const cityChangeHandler = (event) => {
       dispatchCity({ type: 'USER_INPUT', val: event.target.value });
   
-      // setFormIsValid(
-      //   event.target.value.includes('@') && passwordState.isValid
-      // );
+    
     };
   
 
@@ -264,9 +256,6 @@ import React, {
     const countryChangeHandler = (event) => {
       dispatchCountry({ type: 'USER_INPUT', val: event.target.value });
   
-      // setFormIsValid(
-      //   event.target.value.includes('@') && passwordState.isValid
-      // );
     };
   
 
@@ -279,9 +268,6 @@ import React, {
       console.log(event.target.value );
       dispatchNumber({ type: 'USER_INPUT', val: event.target.value });
   
-      // setFormIsValid(
-      //   event.target.value.includes('@') && passwordState.isValid
-      // );
     };
   
 
@@ -311,11 +297,11 @@ import React, {
       dispatchPassword({ type: 'INPUT_BLUR' });
     };
 
-   function hideErrorModalHandler() {//da se ukloni prozorcic
+   function hideErrorModalHandler() {
       setInfoData(null);
    }
   
-   function hideSuccessModalHandler() { //isto da ukloni prozor sa obavestenjem
+   function hideSuccessModalHandler() { 
     setInfoData(null);
     history.replace('/');
   }
@@ -352,7 +338,6 @@ import React, {
         
       };
       const data = await sendRequest(requestConfig);
-      //ono sto vrati server kao odg
      
      if(data.result === 'OK'){
       setInfoData({
@@ -361,7 +346,12 @@ import React, {
       });
      
      }
-
+    else if(data.result === 'Email already exists'){
+      setInfoData({
+        title: "Error",
+        message: "Email already exists!",
+      });
+    }
     else{
       setInfoData({
         title: "Error",

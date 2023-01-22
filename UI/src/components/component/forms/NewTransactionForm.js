@@ -102,14 +102,7 @@ function NewTransactionForm() {
         }, 500);
 
 
-          //verifySocket.onmessage=function(ev){
-            //console.log("Usao sam u fju ")
-            //setIsLoad(true)
-              
-           // console.log(ev.data)
-           //alert(ev.data)
-      // }
-       
+         
 
         return () => {
             console.log('CLEANUP');
@@ -139,11 +132,11 @@ function NewTransactionForm() {
 
    
 
-    function hideErrorModalHandler() {//da se ukloni prozorcic
+    function hideErrorModalHandler() {
         setInfoData(null);
     }
 
-    function hideSuccessModalHandler() { //isto da ukloni prozor sa obavestenjem
+    function hideSuccessModalHandler() { 
         setInfoData(null);
         history.replace('/');
     }
@@ -174,8 +167,8 @@ function NewTransactionForm() {
     
             const data = await sendRequest(requestConfig);
 
-             console.log(data)
-            if (data.result === 'ERROR') {//promeniti u skladu sa odg sa servera
+             
+            if (data.result === 'ERROR') {
                 setInfoData({
                     title: "Error",
                     message: "Error in transaction",
@@ -184,26 +177,20 @@ function NewTransactionForm() {
             }
             else{
                 authCtx.loading(true)
-        
+                authCtx.addType("Posalji drugom korisniku")
         let verifySocket = new WebSocket("ws://localhost:5000/transactions/verifysocket");
        
        
 
         verifySocket.addEventListener('message', (event) => {
-            console.log("cekam odg")
-          
            
-           // alert(event.data)
+           
+           
             if(event.data === "True"){
-                authCtx.addData(true)
-               
-               
-               
-               
-           
-                
-            
-               
+                authCtx.addData("Prenos para uspeo")
+            }
+            else{
+                authCtx.addData("Prenos para nije uspeo")
             }
          
         });
@@ -212,10 +199,7 @@ function NewTransactionForm() {
                
             }
            
-           // verifySocket.onmessage=function(ev){
-            
-             //console.log(ev.data)
-            
+           
              
             
 

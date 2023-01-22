@@ -15,34 +15,114 @@ function BuyAndExchangePage() {
    
 
     useEffect(() => {
-      console.log(authCtx.isLoading)
-
-     if(authCtx.isLoading){
-       
-        setIsLoad(true)
-        if(authCtx.data){
+        console.log(authCtx.isLoading)
+    
+        if(authCtx.isLoading){
+            if(authCtx.transactionType === "Kupi i zameni valute"){
+                setIsLoad(true)
+            }
+         
+          
+          if(authCtx.data === "Prenos para uspeo"){
+             
+              authCtx.loading(false)
+              setIsLoad(false)
+              setInfoData({
+                  title: "Success",
+                  message:" Transaction sucessed" ,
+              });
+                 authCtx.addData("nije")
+          }
+          if(authCtx.data === "Prenos para nije uspeo") {
+              authCtx.loading(false)
+              setIsLoad(false)
+              setInfoData({
+                  title: "Error",
+                  message:" Transaction denied" ,
+              });
+              authCtx.addData("nije")
+          }
+         
+          if(authCtx.data === "Uplata dolara na svoj racun"){
+             
+            authCtx.loading(false)
+            setIsLoad(false)  
+         setInfoData({
+        title:  "Success",
+        message: "Money successfully paid into the account!",
+      });
+            authCtx.addData("nije")
            
+        }
+        if(authCtx.data === "Uplata na svoj racun nije uspela"){
+             
+            authCtx.loading(false)
+            setIsLoad(false) 
+         setInfoData({
+        title:  "Error",
+        message: "Error in payment $!!",
+      });
+            authCtx.addData("nije")
+           
+        }
+        if(authCtx.data === "Uspesno ste kupili dolare"){
+             
             authCtx.loading(false)
             setIsLoad(false)
+           
             setInfoData({
                 title: "Success",
-                message:" Transaction sucessed" ,
+                message: "You buy criptocurrencies!",
             });
-           // authCtx.loading(false)
            
-          
-              
-               // history.replace("/");
-            
-               authCtx.addData(false)
+               authCtx.addData("nije")
         }
-        
-     }
+        if(authCtx.data === "Neuspesno ste kupili dolare") {
+            authCtx.loading(false)
+            setIsLoad(false)
+          
+                setInfoData({
+                    title: "Error",
+                    message: "Payment error!",
+                });
+               
+
+            authCtx.addData("nije")
+        }
+        if(authCtx.data === "Uspesno ste zamenili valute"){
+             
+            authCtx.loading(false)
+            setIsLoad(false)
+           
+            setInfoData({
+                title: "Success",
+                message: "You change criptocurrencies!",
+            });
+           
+               authCtx.addData("nije")
+        }
+        if(authCtx.data === "Neuspesno ste zamenili valute") {
+            authCtx.loading(false)
+            setIsLoad(false)
+          
+                setInfoData({
+                    title: "Error",
+                    message: "Error in exchange criptocurrencies!",
+                });
+               
+
+            authCtx.addData("nije")
+        }
+       }
+    
+       
+      
+       
+      
      
     
-   
-
-}, [infoData, authCtx.addData]);
+    }, [infoData, authCtx.addData]);
+    
 
 
 
@@ -52,7 +132,7 @@ function BuyAndExchangePage() {
     }
     function hideSuccessModalHandler() { //isto da ukloni prozor sa obavestenjem
         setInfoData(null);
-       history.replace("/exchange")
+       history.replace("/balance")
     
     }
     return (
@@ -64,6 +144,7 @@ function BuyAndExchangePage() {
             <h1>By</h1>
             
          </div>
+         {(isLoad) && <Modal />}
          {infoData &&  (
                     <InfModal
                         title={infoData.title}

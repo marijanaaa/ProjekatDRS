@@ -27,52 +27,122 @@ function AccountBalancePage() {
    const [USDT, setUSDT] = useState(null);
   const authCtx = useContext(AuthContext);
 
-
-
-
-
-
- 
-
-
-
-  
-
-
-
   useEffect(() => {
-
-
-
-    console.log(authCtx.isLoading)
-
     if(authCtx.isLoading){
-      
-       setIsLoad(true)
-       if(authCtx.data){
-          
-           authCtx.loading(false)
-           setIsLoad(false)
-           setInfoData({
-               title: "Success",
-               message:" Transaction sucessed" ,
-           });
-          // authCtx.loading(false)
-          
          
-             
-              // history.replace("/");
-           
-              authCtx.addData(false)
-       }
+      setIsLoad(true)
+      if(authCtx.data === "Prenos para uspeo"){
+         
+          authCtx.loading(false)
+          setIsLoad(false)
+          setInfoData({
+              title: "Success",
+              message:" Transaction sucessed" ,
+          });
+             authCtx.addData("nije")
+      }
+      if(authCtx.data === "Prenos para nije uspeo") {
+          authCtx.loading(false)
+          setIsLoad(false)
+          setInfoData({
+              title: "Error",
+              message:" Transaction denied" ,
+          });
+          authCtx.addData("nije")
+      }
+      if(authCtx.data === "Verifikacija uspela"){
+         
+          authCtx.loading(false)
+          setIsLoad(false)      
+       setInfoData({
+      title:  "Success",
+      message: "1$ has been successfully deducted from your card!",
+    });
+          authCtx.addData("nije")
+         
+      }
+      if(authCtx.data === "Verifikacija nije uspela"){
+         
+          authCtx.loading(false)
+          setIsLoad(false)
+          setInfoData({
+              title:  "Error",
+              message: "Card does not exist! ",
+            });
+          authCtx.addData("nije")
+      }
+     
+      if(authCtx.data === "Uplata dolara na svoj racun"){
+         
+        authCtx.loading(false)
+        setIsLoad(false)  
+     setInfoData({
+    title:  "Success",
+    message: "Money successfully paid into the account!",
+  });
+        authCtx.addData("nije")
        
     }
-    
-   
+    if(authCtx.data === "Uplata na svoj racun nije uspela"){
+         
+        authCtx.loading(false)
+        setIsLoad(false) 
+     setInfoData({
+    title:  "Error",
+    message: "Money successfully paid into the account!",
+  });
+        authCtx.addData("nije")
+       
+    }
+    if(authCtx.data === "Uspesno ste kupili dolare"){
+         
+        authCtx.loading(false)
+        setIsLoad(false)
+       
+        setInfoData({
+            title: "Success",
+            message: "You buy criptocurrencies!",
+        });
+       
+           authCtx.addData("nije")
+    }
+    if(authCtx.data === "Neuspesno ste kupili dolare") {
+        authCtx.loading(false)
+        setIsLoad(false)
+      
+            setInfoData({
+                title: "Success",
+                message: "Payment error!",
+            });
+           
 
+        authCtx.addData("nije")
+    }
+    if(authCtx.data === "Uspesno ste zamenili valute"){
+         
+        authCtx.loading(false)
+        setIsLoad(false)
+       
+        setInfoData({
+            title: "Success",
+            message: "You change criptocurrencies!",
+        });
+       
+           authCtx.addData("nije")
+    }
+    if(authCtx.data === "Neuspesno ste zamenili valute") {
+        authCtx.loading(false)
+        setIsLoad(false)
+      
+            setInfoData({
+                title: "Success",
+                message: "Error in exchange criptocurrencies!",
+            });
+           
 
-
-
+        authCtx.addData("nije")
+    }
+   }
   async function getCurrency() {
     const requestConfig = {
       url: 'http://localhost:5000/getAccountBalance',
@@ -91,11 +161,16 @@ function AccountBalancePage() {
       
     };
 
-    //token:true-znaci da ocekuje da nam ga server napravi.
 
     const data = await sendRequest(requestConfig);
+    if(data.result === 'Can not load account balance from this user'){
+      setInfoData({
+        title: "Error",
+        message: "Can not load account balance from this user",
+      });
+     
+     }
    
-    //u data je ono sto server posalje kao odgovor(u firebase salje name)
 
     console.log(data)
     setDollars(data.dollars)
@@ -114,11 +189,12 @@ function AccountBalancePage() {
 
     }, [authCtx.token, sendRequest, infoData, authCtx.addData]);
 
-    function hideErrorModalHandler() {//da se ukloni prozorcic
+    function hideErrorModalHandler() {
       setInfoData(null);
   }
-  function hideSuccessModalHandler() { //isto da ukloni prozor sa obavestenjem
-      setInfoData(null);
+  function hideSuccessModalHandler() { 
+    authCtx.verify();
+    setInfoData(null);
      history.replace("/balance")
   
   }

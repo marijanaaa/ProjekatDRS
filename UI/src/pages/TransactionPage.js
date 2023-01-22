@@ -22,10 +22,12 @@ function TransactionPage() {
     useEffect(() => {
         console.log(authCtx.isLoading)
   
-       if(authCtx.isLoading){
+        if(authCtx.isLoading){
+           setIsLoad(true)
+          
          
-          setIsLoad(true)
-          if(authCtx.data){
+          
+          if(authCtx.data === "Prenos para uspeo"){
              
               authCtx.loading(false)
               setIsLoad(false)
@@ -33,16 +35,90 @@ function TransactionPage() {
                   title: "Success",
                   message:" Transaction sucessed" ,
               });
-             // authCtx.loading(false)
-             
-            
-                
-                 // history.replace("/");
-              
-                 authCtx.addData(false)
+                 authCtx.addData("nije")
           }
+          if(authCtx.data === "Prenos para nije uspeo") {
+              authCtx.loading(false)
+              setIsLoad(false)
+              setInfoData({
+                  title: "Error",
+                  message:" Transaction denied" ,
+              });
+              authCtx.addData("nije")
+          }
+         
+          if(authCtx.data === "Uplata dolara na svoj racun"){
+             
+            authCtx.loading(false)
+            setIsLoad(false)  
+         setInfoData({
+        title:  "Success",
+        message: "Money successfully paid into the account!",
+      });
+            authCtx.addData("nije")
+           
+        }
+        if(authCtx.data === "Uplata na svoj racun nije uspela"){
+             
+            authCtx.loading(false)
+            setIsLoad(false) 
+         setInfoData({
+        title:  "Error",
+        message: "Error in payment $!!",
+      });
+            authCtx.addData("nije")
+           
+        }
+        if(authCtx.data === "Uspesno ste kupili dolare"){
+             
+            authCtx.loading(false)
+            setIsLoad(false)
+           
+            setInfoData({
+                title: "Success",
+                message: "You buy criptocurrencies!",
+            });
+           
+               authCtx.addData("nije")
+        }
+        if(authCtx.data === "Neuspesno ste kupili dolare") {
+            authCtx.loading(false)
+            setIsLoad(false)
           
+                setInfoData({
+                    title: "Error",
+                    message: "Payment error!",
+                });
+               
+
+            authCtx.addData("nije")
+        }
+        if(authCtx.data === "Uspesno ste zamenili valute"){
+             
+            authCtx.loading(false)
+            setIsLoad(false)
+           
+            setInfoData({
+                title: "Success",
+                message: "You change criptocurrencies!",
+            });
+           
+               authCtx.addData("nije")
+        }
+        if(authCtx.data === "Neuspesno ste zamenili valute") {
+            authCtx.loading(false)
+            setIsLoad(false)
+          
+                setInfoData({
+                    title: "Error",
+                    message: "Error in exchange criptocurrencies!",
+                });
+               
+
+            authCtx.addData("nije")
+        }
        }
+    
        
       
      

@@ -208,40 +208,41 @@ import InfModal from '../modals/InfModal';
         
       };
 
-      //token:true-znaci da ocekuje da nam ga server napravi.
+      
 
       const data = await sendRequest(requestConfig);
      
      
-  
      
-  
-      if(data.result === 'ERROR'){
-       
-       //nije uspesno logovanje
+      if (data.result === 'ERROR') {
         setInfoData({
-          title:  "Error",
-          message: "Card does not exist! ",
+            title: "Error",
+            message: "Error in transaction",
         });
-         history.replace("/verification");
-        
-       
-       
-        }
-        else{
-      
-        authCtx.verify();
-       setInfoData({
-        title:  "Success",
-        message: "1$ has been successfully deducted from your card!",
-      });
-     
-      history.replace("/");
-        }
 
-       
-      
     }
+    else{
+        authCtx.loading(true)
+
+        let verifySocket = new WebSocket("ws://localhost:5000/exchanges/verificationUser");
+
+
+
+        verifySocket.addEventListener('message', (event) => {
+   
+   
+   
+     if(event.data === "True"){
+        authCtx.addData("Verifikacija uspela")
+        
+     }
+    else{
+        authCtx.addData("Verifikacija nije uspela")
+    }
+ 
+});
+      }
+}
 
   
    

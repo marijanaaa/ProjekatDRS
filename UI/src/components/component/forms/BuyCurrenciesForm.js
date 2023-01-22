@@ -101,11 +101,11 @@ function BuyCurrenciesForm() {
 
    
 
-    function hideErrorModalHandler() {//da se ukloni prozorcic
+    function hideErrorModalHandler() {
         setInfoData(null);
     }
 
-    function hideSuccessModalHandler() { //isto da ukloni prozor sa obavestenjem
+    function hideSuccessModalHandler() { 
         setInfoData(null);
         history.replace('/');
     }
@@ -133,20 +133,40 @@ function BuyCurrenciesForm() {
             console.log(currencyInputRef.current.value)
             const data = await sendRequest(requestConfig);
 
-             console.log(data)
-            if (data.result === 'ERROR') {//promeniti u skladu sa odg sa servera
+
+
+
+              
+            if (data.result === 'ERROR') {
                 setInfoData({
                     title: "Error",
-                    message: "Payment error",
+                    message: "Error in transaction",
                 });
 
             }
-            else {
-                setInfoData({
-                    title: "Success",
-                    message: "You buy criptocurrencies!",
-                });
+            else{
+                authCtx.loading(true)
+            authCtx.addType("Kupi i zameni valute")
+        let verifySocket = new WebSocket("ws://localhost:5000/exchanges/DollarCryptoSocket");
+       
+       
 
+        verifySocket.addEventListener('message', (event) => {
+           
+           console.log(event.data)
+           
+            if(event.data === "True"){
+                authCtx.addData("Uspesno ste kupili dolare")
+            }
+            else if(event.data === "False"){
+                authCtx.addData("Neuspesno ste kupili dolare")
+            }
+           
+         
+        });
+              
+             
+               
             }
 
         }
